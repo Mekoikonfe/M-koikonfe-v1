@@ -14,6 +14,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Remettre les fichiers dans leurs dossiers
+        # L'envoi par le site GitHub peut aplatir les dossiers : on les reconstruit avant de lancer quoi que ce soit.
+        run: |
+          mkdir -p data ingestion tests scripts
+          for f in catalog.js catalog.json; do if [ -f "$f" ]; then mv "$f" data/; fi; done
+          if [ -f sync.py ]; then mv sync.py ingestion/; fi
+          for f in test_*.py *.test.cjs; do if [ -f "$f" ]; then mv "$f" tests/; fi; done
+          if [ -f build-site.sh ]; then mv build-site.sh scripts/; fi
+          ls data ingestion tests scripts
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
