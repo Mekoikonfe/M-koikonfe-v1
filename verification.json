@@ -1,0 +1,53 @@
+{
+  "checkedAt": "2026-10-25T15:34:29.842453+00:00",
+  "sources": [
+    {
+      "name": "paris",
+      "status": "ok",
+      "checkedAt": "2026-10-25T15:34:29.842453+00:00",
+      "received": 3227,
+      "accepted": 1940,
+      "excluded": 1287
+    },
+    {
+      "name": "openagenda",
+      "status": "not_configured"
+    }
+  ],
+  "normalizedEvents": 1935,
+  "withSessions": 1066,
+  "categories": {
+    "concert": 721,
+    "theatre": 469,
+    "festival": 44,
+    "cinema": 116,
+    "expo": 353,
+    "musical": 56,
+    "humour": 19,
+    "danse": 125,
+    "cirque": 32
+  },
+  "examples": [
+    {
+      "title": "Les 4 Saisons de Vivaldi Intégrale & Petite Musique de Nuit de Mozart",
+      "url": "https://www.paris.fr/evenements/les-4-saisons-de-vivaldi-integrale-petite-musique-de-nuit-de-mozart-14223"
+    },
+    {
+      "title": "Requiem de Mozart & Boléro de Ravel",
+      "url": "https://www.paris.fr/evenements/requiem-de-mozart-bolero-de-ravel-23321"
+    },
+    {
+      "title": "Les 4 Saisons de Vivaldi, Ave Maria et Célèbres Adagios",
+      "url": "https://www.paris.fr/evenements/les-4-saisons-de-vivaldi-ave-maria-et-celebres-adagios-23322"
+    },
+    {
+      "title": "Les 4 saisons de Vivaldi, Ave Maria et célèbres concertos",
+      "url": "https://www.paris.fr/evenements/les-4-saisons-de-vivaldi-ave-maria-et-celebres-concertos-23327"
+    },
+    {
+      "title": "Requiem de Mozart & Boléro de Ravel",
+      "url": "https://www.paris.fr/evenements/requiem-de-mozart-bolero-de-ravel-23332"
+    }
+  ],
+  "tests": "9 tests Python, 42 assertions historiques et intégration réelle réussis. Parcours Laure et organisateur vérifiés dans le navigateur. OpenAgenda non testé en direct."
+}

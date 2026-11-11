@@ -1,0 +1,11 @@
+const {strict:assert}=require('node:assert');const {plan,clock,minutes}=require('../planner-core.js');
+const base={start:'20:00',duration:120,meal:75,walk:12,margin:20,order:'before',slot:'18:00'};
+assert.equal(plan(base).gap,13);assert.equal(plan(base).ok,true);
+assert.equal(plan({...base,slot:'19:00'}).ok,false);
+assert.equal(plan({...base,slot:'18:13'}).gap,0);
+assert.equal(plan({...base,order:'after',slot:'22:00'}).ok,false);
+assert.equal(plan({...base,order:'after',slot:'22:32'}).gap,0);
+assert.equal(plan({...base,start:'23:00',order:'after',slot:'01:45'}).gap,13);
+assert.equal(clock(1500),'J+1 01:00');assert.equal(minutes('00:00'),0);
+assert.throws(()=>minutes('25:00'));assert.throws(()=>minutes('12:61'));assert.throws(()=>plan({...base,walk:-1}));assert.throws(()=>plan({...base,margin:0}));
+console.log('12 assertions réussies : compatibilité, limites, minuit, saisies invalides.');

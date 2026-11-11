@@ -1,0 +1,1139 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Entracte (Copy)</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&family=Instrument+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap">
+<style>
+/* Layout : appli mobile une colonne, onboarding en 5 "billets", puis 5 pages (Aujourd'hui, Agenda, Explorer, Favoris, Profil) avec barre d'onglets fixe */
+:root{
+  --bg:#EDEEF5; --surface:#FFFFFF; --ink:#16132C; --muted:#5E5A78; --line:#D6D6E6;
+  --accent:#FF4F1F; --accent-ink:#FFFFFF; --ticket:#FFD43B; --teal:#0A7F78; --chip:#F4F4FA; --rose:#D63F7A;
+  --display:"Bricolage Grotesque", "Arial Black", system-ui, sans-serif;
+  --body:"Instrument Sans", system-ui, -apple-system, sans-serif;
+  --mono:"DM Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#110F22; --surface:#1C1934; --ink:#F1EFFA; --muted:#A6A2C4; --line:#2F2B4D;
+  --accent:#FF6A3D; --accent-ink:#16132C; --ticket:#FFD43B; --teal:#2CC9BE; --chip:#24203F; --rose:#FF7AAE; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#110F22; --surface:#1C1934; --ink:#F1EFFA; --muted:#A6A2C4; --line:#2F2B4D;
+  --accent:#FF6A3D; --accent-ink:#16132C; --ticket:#FFD43B; --teal:#2CC9BE; --chip:#24203F; --rose:#FF7AAE; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 120px}
+.app{max-width:480px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{font-family:var(--display);font-weight:800;font-size:1.5rem;letter-spacing:-.02em}
+.brand span{color:var(--accent)}
+.stub{font-family:var(--mono);font-size:.75rem;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+
+.perfs{display:flex;gap:6px}
+.perfs i{flex:1;height:6px;border-radius:3px;background:var(--line);transition:background .3s}
+.perfs i.on{background:var(--accent)}
+
+.ticket{position:relative;background:var(--surface);border-radius:18px;padding:24px 20px 20px;
+  box-shadow:0 1px 0 var(--line),0 12px 30px -18px rgba(22,19,44,.45)}
+.ticket.notch::before,.ticket.notch::after{content:"";position:absolute;top:92px;width:22px;height:22px;border-radius:50%;background:var(--bg)}
+.ticket.notch::before{left:-11px}.ticket.notch::after{right:-11px}
+.tear{border-top:2px dashed var(--line);margin:14px -20px 18px}
+.eyebrow{font-family:var(--mono);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--teal)}
+h1,h2,h3{font-family:var(--display);font-weight:800;letter-spacing:-.025em;text-wrap:balance;margin:0;line-height:1.05}
+h1{font-size:2.2rem;margin-top:6px}
+h2{font-size:1.7rem;margin-top:6px}
+.sec-title{font-size:1.3rem;display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.sec-title small{font-family:var(--mono);font-size:.72rem;font-weight:400;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+.lead{color:var(--muted);margin:10px 0 0;max-width:60ch}
+.step{animation:in .45s cubic-bezier(.2,.8,.2,1)}
+@keyframes in{from{transform:translateY(14px);opacity:.2}to{transform:none;opacity:1}}
+
+label.f{display:block;font-weight:600;font-size:.9rem;margin-bottom:6px}
+input[type=text],input[type=search]{width:100%;font:inherit;padding:12px 14px;border-radius:12px;border:1.5px solid var(--line);background:var(--chip);color:var(--ink)}
+input:focus-visible,button:focus-visible{outline:3px solid var(--ticket);outline-offset:2px}
+.stack{display:flex;flex-direction:column;gap:16px}
+
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.tile{font:inherit;color:var(--ink);text-align:left;background:var(--chip);border:2px solid transparent;border-radius:14px;
+  padding:14px 12px;cursor:pointer;display:flex;flex-direction:column;gap:4px;transition:transform .15s,border-color .15s,background .15s;min-width:0}
+.tile:hover{transform:translateY(-2px)}
+.tile b{font-family:var(--display);font-weight:800;font-size:1.05rem;letter-spacing:-.01em}
+.tile small{color:var(--muted);font-size:.8rem;line-height:1.3}
+.tile .glyph{font-family:var(--display);font-weight:800;font-size:1.6rem;line-height:1;color:var(--accent)}
+.tile[aria-pressed=true]{border-color:var(--accent);background:var(--surface);transform:rotate(-1.2deg)}
+.tile[aria-pressed=true] .glyph{color:var(--ink)}
+.hint{font-size:.82rem;color:var(--muted);margin:10px 0 0}
+
+.duel{display:grid;grid-template-columns:1fr auto 1fr;align-items:stretch;gap:8px}
+.duel .tile{text-align:center;align-items:center;justify-content:center;min-height:80px}
+.vs{align-self:center;font-family:var(--mono);font-size:.75rem;color:var(--muted)}
+.duels{display:flex;flex-direction:column;gap:12px}
+
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chipbtn{font:inherit;font-size:.9rem;padding:8px 14px;border-radius:999px;border:1.5px solid var(--line);background:transparent;color:var(--ink);cursor:pointer}
+.chipbtn[aria-pressed=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+
+.actions{display:flex;gap:10px;justify-content:space-between;align-items:center;margin-top:20px}
+.btn{font:inherit;font-weight:600;border:0;border-radius:999px;padding:13px 22px;cursor:pointer}
+.btn.primary{background:var(--accent);color:var(--accent-ink)}
+.btn.primary:disabled{opacity:.4;cursor:not-allowed}
+.btn.ghost{background:transparent;color:var(--muted);padding-inline:6px}
+.btn.outline{background:transparent;border:1.5px solid var(--line);color:var(--ink)}
+
+/* bandeau de jours */
+.days{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 8px;scroll-snap-type:x mandatory}
+.day{font:inherit;flex:0 0 58px;scroll-snap-align:start;display:flex;flex-direction:column;align-items:center;gap:0;padding:8px 4px;border-radius:14px;
+  border:1.5px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.day small{font-family:var(--mono);font-size:.66rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.day b{font-family:var(--display);font-weight:800;font-size:1.35rem;line-height:1.1;font-variant-numeric:tabular-nums}
+.day i{font-style:normal;font-size:.66rem;color:var(--muted)}
+.day[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.day[aria-pressed=true] small,.day[aria-pressed=true] i{color:var(--bg);opacity:.75}
+
+.greet{display:flex;flex-direction:column;gap:2px}
+.greet p{margin:0;color:var(--muted)}
+.section{display:flex;flex-direction:column;gap:12px}
+.occ{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;padding:4px 10px;border-radius:999px;background:var(--chip);color:var(--ink)}
+.occ.couple{color:var(--rose)}
+.occ.famille{color:var(--teal)}
+
+.cards{display:flex;flex-direction:column;gap:12px}
+.ev{display:grid;grid-template-columns:72px minmax(0,1fr);background:var(--surface);border-radius:16px;overflow:hidden;box-shadow:0 1px 0 var(--line);cursor:pointer;text-align:left;font:inherit;color:inherit;border:0;padding:0;width:100%}
+.ev .side{background:var(--ink);color:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+  padding:12px 6px;border-right:2px dashed var(--bg);font-family:var(--mono);text-align:center}
+.ev .side .pct{font-family:var(--display);font-weight:800;font-size:1.45rem;color:var(--ticket);line-height:1}
+.ev .side small{font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;opacity:.75}
+.ev .side .hr{font-size:.8rem;margin-top:6px;font-variant-numeric:tabular-nums}
+.ev .main{padding:12px 14px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.ev .cat{font-family:var(--mono);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--teal)}
+.ev h3{font-size:1.1rem;letter-spacing:-.01em;line-height:1.15}
+.ev .meta{font-size:.85rem;color:var(--muted)}
+.ev .why{font-size:.82rem;color:var(--ink)}
+.ev .why b{color:var(--accent)}
+.price{font-family:var(--mono);font-weight:500;font-variant-numeric:tabular-nums;font-size:.85rem}
+.heart{color:var(--rose)}
+.empty{text-align:center;color:var(--muted);padding:18px;background:var(--surface);border-radius:16px}
+
+/* agenda */
+.agenda{display:flex;flex-direction:column;gap:10px}
+.aday{display:grid;grid-template-columns:64px minmax(0,1fr) auto;gap:12px;align-items:center;background:var(--surface);border-radius:14px;padding:12px 14px;border:0;font:inherit;color:inherit;text-align:left;cursor:pointer;width:100%}
+.aday .d{font-family:var(--mono);font-size:.72rem;text-transform:uppercase;color:var(--muted);line-height:1.2}
+.aday .d b{display:block;font-family:var(--display);font-size:1.5rem;color:var(--ink);font-variant-numeric:tabular-nums}
+.aday .t{min-width:0}
+.aday .t strong{display:block;font-family:var(--display);font-size:1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.aday .t span{font-size:.8rem;color:var(--muted)}
+.aday .n{font-family:var(--mono);font-size:.78rem;background:var(--chip);padding:4px 9px;border-radius:999px;white-space:nowrap}
+.aday.we{box-shadow:inset 4px 0 0 var(--ticket)}
+.weekhead{font-family:var(--mono);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-top:6px}
+
+/* accueil */
+.feature{font:inherit;text-align:left;border:0;cursor:pointer;background:var(--ink);color:var(--bg);border-radius:18px;padding:20px;display:flex;flex-direction:column;gap:6px;position:relative;overflow:hidden}
+.feature .eyebrow{color:var(--ticket)}
+.feature strong{font-family:var(--display);font-weight:800;font-size:1.6rem;line-height:1.05;letter-spacing:-.02em;padding-right:70px}
+.feature>span{opacity:.85;font-size:.9rem}
+.feature .fpct{position:absolute;top:18px;right:18px;opacity:1;font-family:var(--mono);font-size:.72rem;background:var(--ticket);color:#16132C;padding:4px 9px;border-radius:999px}
+.carousel{display:flex;gap:10px;overflow-x:auto;padding-bottom:6px;scroll-snap-type:x mandatory;margin-inline:-4px;padding-inline:4px}
+.hcard{font:inherit;color:inherit;text-align:left;border:0;cursor:pointer;flex:0 0 200px;scroll-snap-align:start;background:var(--surface);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:4px;position:relative;min-height:170px;box-shadow:0 1px 0 var(--line)}
+.hcard .badge{align-self:flex-start;font-family:var(--mono);font-size:.64rem;letter-spacing:.08em;text-transform:uppercase;background:var(--accent);color:var(--accent-ink);padding:3px 8px;border-radius:999px}
+.hcard .hpct{position:absolute;top:14px;right:14px;font-family:var(--display);font-weight:800;color:var(--accent)}
+.hcard strong{font-family:var(--display);font-weight:800;font-size:1.15rem;line-height:1.1;margin-top:auto}
+.hcard span{font-size:.8rem;color:var(--muted)}
+.hcard .when{font-family:var(--mono);font-size:.72rem;color:var(--ink)}
+.link{font:inherit;font-size:.8rem;font-weight:600;color:var(--accent);background:none;border:0;cursor:pointer;padding:0}
+.sec-title span{min-width:0}
+.rows{display:flex;flex-direction:column;background:var(--surface);border-radius:16px;overflow:hidden}
+.rowev{display:grid;grid-template-columns:86px minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 14px;border:0;border-bottom:1px solid var(--line);background:transparent;font:inherit;color:inherit;text-align:left;cursor:pointer}
+.rowev:last-child{border-bottom:0}
+.rowev .rd{font-family:var(--mono);font-size:.72rem;color:var(--muted);line-height:1.3}
+.rowev .rd b{display:block;color:var(--ink);font-size:.9rem;font-variant-numeric:tabular-nums}
+.rowev .rt{min-width:0}
+.rowev .rt strong{display:block;font-family:var(--display);font-size:1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rowev .rt span{font-size:.8rem;color:var(--muted);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rowev .rp{font-family:var(--display);font-weight:800;color:var(--accent)}
+.weteaser{font:inherit;color:#16132C;background:var(--ticket);border:0;border-radius:16px;padding:16px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;text-align:left}
+.weteaser small{display:block;font-family:var(--mono);font-size:.7rem;letter-spacing:.08em;text-transform:uppercase}
+.weteaser strong{font-family:var(--display);font-size:1.15rem}
+.weteaser .arrow{font-size:1.5rem;font-weight:700}
+
+/* découvrir */
+.swipezone{position:relative;height:min(64vh,520px);min-height:400px}
+.scard{position:absolute;inset:0;border-radius:24px;color:#fff;padding:22px 20px;display:flex;flex-direction:column;justify-content:flex-end;gap:6px;overflow:hidden;
+  background:linear-gradient(160deg,var(--c1),var(--c2));box-shadow:0 18px 40px -20px rgba(22,19,44,.6);touch-action:none;user-select:none;cursor:grab;
+  transform:translateY(calc(var(--i)*10px)) scale(calc(1 - var(--i)*.04));transition:transform .25s}
+.scard::after{content:"";position:absolute;inset:40% 0 0;background:linear-gradient(transparent,rgba(10,8,25,.55));pointer-events:none}
+.scard>*{position:relative;z-index:1}
+.scard .art{position:absolute;top:22px;left:20px;right:20px;z-index:0;font-family:var(--display);font-weight:800;font-size:clamp(3.4rem,17vw,6rem);line-height:.9;letter-spacing:-.04em;opacity:.35;overflow-wrap:anywhere}
+.scard h2{font-size:2rem;color:#fff;margin:0}
+.scat{font-family:var(--mono);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;opacity:.9}
+.smeta{font-size:.9rem;opacity:.92}
+.sfoot{display:flex;justify-content:space-between;align-items:center;gap:8px;font-family:var(--mono);font-size:.85rem}
+.spct{background:#FFD43B;color:#16132C;padding:4px 10px;border-radius:999px;font-weight:500}
+.swhy{font-size:.82rem;opacity:.9}
+.stamp{position:absolute;top:26px;z-index:2;padding:4px 12px;border:3px solid currentColor;border-radius:10px;font-family:var(--display);font-weight:800;font-size:1.5rem;opacity:0;pointer-events:none}
+.stamp.like{right:20px;color:#C8FF6B;transform:rotate(12deg)}
+.stamp.nope{left:20px;color:#fff;transform:rotate(-12deg)}
+.scard.top:focus-visible{outline:3px solid var(--ticket);outline-offset:4px}
+.swbtns{display:flex;justify-content:center;align-items:center;gap:20px}
+.swb{border:0;border-radius:50%;width:60px;height:60px;background:var(--surface);color:var(--ink);font-size:1.5rem;font-weight:700;cursor:pointer;box-shadow:0 8px 20px -12px rgba(22,19,44,.6)}
+.swb.like{color:var(--rose);width:68px;height:68px;font-size:1.8rem}
+.swb.info{width:46px;height:46px;font-size:1.1rem;font-family:var(--display)}
+.swhint{font-size:.8rem;color:var(--muted);text-align:center;margin:0}
+.swempty{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:var(--surface);border-radius:24px;text-align:center;padding:20px}
+.swempty p{color:var(--muted);margin:0}
+@media (prefers-reduced-motion:reduce){.scard{transition:none}}
+
+/* avis */
+.avbtn{font:inherit;font-size:.82rem;font-weight:600;border:1.5px solid var(--accent);color:var(--accent);background:transparent;border-radius:999px;padding:7px 12px;cursor:pointer}
+.avform{display:flex;flex-direction:column;gap:16px}
+.avform textarea{width:100%;font:inherit;padding:12px 14px;border-radius:12px;border:1.5px solid var(--line);background:var(--chip);color:var(--ink);resize:vertical}
+.avform textarea:focus-visible{outline:3px solid var(--ticket);outline-offset:2px}
+.stars{display:flex;gap:6px}
+.star{font-size:2rem;line-height:1;border:0;background:transparent;color:var(--accent);cursor:pointer;padding:2px}
+.opt{font-weight:400;color:var(--muted)}
+.averr{color:var(--accent);margin:0;font-weight:600}
+.avfallback{display:flex;flex-direction:column;gap:10px;background:var(--chip);border-radius:12px;padding:12px}
+.avfallback p{margin:0;font-size:.88rem}
+.usagebar{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.usagebar div{background:var(--surface);border-radius:12px;padding:10px 12px}
+.usagebar small{display:block;font-size:.72rem;color:var(--muted)}
+.usagebar b{font-family:var(--display);font-size:1.3rem}
+.avlist{display:flex;flex-direction:column;gap:10px}
+.avitem{background:var(--surface);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:4px}
+.avitem p{margin:0;font-size:.9rem}
+.avhead{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:.8rem;color:var(--muted)}
+.avstars{color:var(--accent);letter-spacing:2px;font-size:1rem}
+
+/* billets */
+.agroup{display:flex;flex-direction:column;gap:6px;margin-top:4px}
+.agroup small{font-family:var(--mono);font-size:.66rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.agroup .chipbtn{font-size:.82rem;padding:6px 12px}
+.addart{display:flex;gap:8px}
+.addart input{flex:1;min-width:0}
+.artbox{background:var(--surface);border-radius:16px;padding:14px}
+.artbox summary{list-style:none;display:flex;justify-content:space-between;align-items:center;gap:10px;cursor:pointer}
+.artbox summary::-webkit-details-marker{display:none}
+.artbox summary small{display:block;font-family:var(--mono);font-size:.66rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.artbox summary strong{font-family:var(--display);font-size:1rem}
+.artbox[open] summary{margin-bottom:10px}
+.artok{width:100%;margin-top:14px;position:sticky;bottom:calc(76px + env(safe-area-inset-bottom,0px))}
+.tks{display:flex;flex-direction:column;gap:10px}
+.tk{display:grid;grid-template-columns:64px minmax(0,1fr);gap:12px;background:var(--surface);border-radius:16px;padding:12px 14px;align-items:start}
+.tk.mine{box-shadow:inset 4px 0 0 var(--accent)}
+.tkdate{display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--chip);border-radius:12px;padding:8px 4px;text-align:center;min-height:64px}
+.tkdate small{font-family:var(--mono);font-size:.58rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.tkdate b{font-family:var(--display);font-size:1.5rem;line-height:1.05;font-variant-numeric:tabular-nums}
+.tkdate i{font-style:normal;font-size:.72rem;color:var(--muted)}
+.pill{font-family:var(--mono);font-size:.62rem;text-transform:uppercase;letter-spacing:.05em;padding:4px 6px;border-radius:8px;background:var(--line);color:var(--ink);line-height:1.2}
+.pill.ok{background:var(--teal);color:var(--surface)}
+.tkmain{display:flex;flex-direction:column;gap:2px;min-width:0}
+.tkmain strong{font-family:var(--display);font-size:1.1rem;line-height:1.15}
+.tkmain>span{font-size:.85rem}
+.tkmain .meta{color:var(--muted);font-size:.8rem}
+.following{font-family:var(--mono);font-size:.62rem;text-transform:uppercase;letter-spacing:.06em;background:var(--accent);color:var(--accent-ink);padding:2px 6px;border-radius:999px;vertical-align:middle}
+.cd{font-family:var(--mono);font-size:.76rem;color:var(--accent);margin-top:2px}
+.cd.q{color:var(--muted)}
+.tkact{grid-column:2;display:flex;gap:6px;flex-wrap:wrap}
+.tkact a.mini{text-decoration:none}
+.mini.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.alertbar{font:inherit;text-align:left;border:0;cursor:pointer;background:var(--accent);color:var(--accent-ink);border-radius:16px;padding:14px 16px;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center}
+.alertbar small{display:block;font-family:var(--mono);font-size:.68rem;text-transform:uppercase;letter-spacing:.08em}
+.alertbar strong{font-family:var(--display);font-size:1.1rem;display:block}
+.alertbar em{font-style:normal;font-size:.8rem;opacity:.85}
+.alertbar .bell{animation:pulse 1.6s infinite}
+.alertbar .arrow{font-size:1.4rem;font-weight:700}
+@keyframes pulse{50%{opacity:.25}}
+.coll .collsub{margin:-6px 0 0;color:var(--muted);font-size:.85rem}
+.hcard .badge.alt{background:var(--ink);color:var(--bg)}
+a.link{text-decoration:none}
+@media (prefers-reduced-motion:reduce){.alertbar .bell{animation:none}}
+
+/* recherche */
+.hright{display:flex;align-items:center;gap:10px}
+.iconbtn{border:0;background:var(--surface);color:var(--ink);width:38px;height:38px;border-radius:50%;display:grid;place-items:center;cursor:pointer}
+.iconbtn svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
+.ask{background:var(--ink);color:var(--bg);border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.ask label{font-family:var(--display);font-weight:800;font-size:1.15rem;letter-spacing:-.01em}
+.askrow{display:flex;gap:8px}
+.askrow input{flex:1;min-width:0;background:var(--bg);color:var(--ink);border-color:transparent}
+.askrow .btn{padding:12px 16px}
+.sugg{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px}
+.sugg .chipbtn{white-space:nowrap;font-size:.8rem;padding:6px 12px;color:var(--bg);border-color:color-mix(in srgb,var(--bg) 35%,transparent)}
+.understood{display:flex;flex-direction:column;gap:6px}
+.understood small{font-family:var(--mono);font-size:.66rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.tag{font-size:.82rem;padding:5px 11px;border-radius:999px;background:var(--ticket);color:#16132C;font-weight:600}
+.srclink{text-align:center;text-decoration:none}
+
+/* week-end */
+.seg{display:flex;gap:4px;background:var(--surface);border-radius:999px;padding:4px;overflow-x:auto}
+.seg button{font:inherit;font-size:.82rem;flex:1;white-space:nowrap;border:0;background:transparent;color:var(--muted);padding:8px 10px;border-radius:999px;cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--ink);color:var(--bg)}
+.filterbox{display:flex;flex-direction:column;gap:10px;background:var(--surface);border-radius:16px;padding:14px}
+.frow{display:flex;flex-direction:column;gap:6px;min-width:0}
+.frow small{font-family:var(--mono);font-size:.66rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.chips.scroll{flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px}
+.chips.scroll .chipbtn{white-space:nowrap}
+
+/* détail */
+.detail .hero{background:var(--ink);color:var(--bg);border-radius:18px;padding:22px 20px;display:flex;flex-direction:column;gap:8px}
+.detail .hero .cat{font-family:var(--mono);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ticket)}
+.detail .hero h1{font-size:2rem}
+.detail .hero p{margin:0;opacity:.8}
+.facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.fact{background:var(--surface);border-radius:12px;padding:10px 12px}
+.fact small{display:block;font-family:var(--mono);font-size:.64rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.fact b{font-family:var(--display);font-size:1.05rem}
+.dates{display:flex;flex-wrap:wrap;gap:6px}
+.dates span{font-family:var(--mono);font-size:.78rem;padding:5px 10px;border-radius:999px;background:var(--surface)}
+.cta{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.note{font-size:.82rem;color:var(--muted);min-height:1.2em;text-align:center;margin:0}
+.backlink{align-self:flex-start}
+
+/* profil */
+.kv{display:flex;flex-direction:column;gap:0;background:var(--surface);border-radius:16px;overflow:hidden}
+.kv button{display:grid;grid-template-columns:110px minmax(0,1fr) auto;gap:10px;align-items:center;padding:14px 16px;border:0;border-bottom:1px solid var(--line);background:transparent;font:inherit;color:inherit;text-align:left;cursor:pointer}
+.kv button:last-child{border-bottom:0}
+.kv small{font-family:var(--mono);font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.kv span{min-width:0}
+.kv i{font-style:normal;color:var(--accent);font-size:.85rem;font-weight:600}
+
+/* barre d'onglets */
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:15;background:var(--surface);border-top:1px solid var(--line);
+  padding:8px max(8px,env(safe-area-inset-right,0px)) calc(8px + env(safe-area-inset-bottom,0px)) max(8px,env(safe-area-inset-left,0px))}
+nav.tabs .in{max-width:520px;margin:0 auto;display:grid;grid-template-columns:repeat(6,1fr);gap:2px}
+nav.tabs button{font:inherit;font-size:.64rem;white-space:nowrap;border:0;background:transparent;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 2px;border-radius:12px;cursor:pointer}
+nav.tabs svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+nav.tabs button[aria-current=page]{color:var(--accent);background:var(--chip)}
+.sample{font-size:.76rem;color:var(--muted);text-align:center;margin:4px 0 0}
+canvas#confetti{position:fixed;inset:0;pointer-events:none;width:100%;height:100%;z-index:20}
+@media (prefers-reduced-motion:reduce){.step{animation:none}.tile,.tile[aria-pressed=true]{transform:none}}
+@media (max-width:360px){h1{font-size:1.9rem}.grid,.catgrid{grid-template-columns:1fr}.facts{grid-template-columns:1fr 1fr}}
+</style>
+
+<canvas id="confetti" aria-hidden="true"></canvas>
+<form name="avis" data-netlify="true" netlify-honeypot="bot-field" hidden><input name="bot-field"><input name="note"><textarea name="aime"></textarea><textarea name="manque"></textarea><input name="usage"><input name="prenom"><input name="page"></form>
+<div class="app">
+  <header><div class="brand">Entr<span>a</span>cte</div><div class="hright"><div class="stub" id="stubno"></div><button class="avbtn" id="havis" hidden>Avis</button><button class="iconbtn" id="hsearch" hidden aria-label="Rechercher"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button></div></header>
+  <div class="perfs" id="perfs" aria-hidden="true"></div>
+  <main id="view"></main>
+</div>
+<nav class="tabs" id="tabs" hidden aria-label="Navigation principale"><div class="in" id="tabsin"></div></nav>
+
+<script>
+const TYPES=[
+ {id:"humour",g:"Ha!",t:"Humour",s:"Stand-up, one-man show"},
+ {id:"theatre",g:"Acte I",t:"Théâtre",s:"Classique ou contemporain"},
+ {id:"concert",g:"♪",t:"Concert",s:"Pop, rock, jazz, électro"},
+ {id:"musical",g:"Tada",t:"Comédie musicale",s:"Ça chante, ça danse"},
+ {id:"danse",g:"5,6,7,8",t:"Danse",s:"Ballet, hip-hop, contemporain"},
+ {id:"cirque",g:"Hop",t:"Cirque & magie",s:"Acrobates, illusionnistes"},
+ {id:"opera",g:"Ah‑ah",t:"Opéra & classique",s:"Orchestres, récitals"},
+ {id:"jeune",g:"Pouet",t:"Jeune public",s:"Pensé pour les enfants"},
+ {id:"salon",g:"Stand B",t:"Salons & expos",s:"Vin, BD, maison, jeux…"},
+ {id:"festival",g:"3 jours",t:"Festivals",s:"Plusieurs scènes, plein air"},
+ {id:"expo",g:"Salle 7",t:"Expositions",s:"Musées, photo, immersif"}
+];
+const WHO=[
+ {id:"solo",g:"1",t:"En solo",s:"Je me fais plaisir"},
+ {id:"couple",g:"2",t:"En amoureux",s:"Une sortie à deux"},
+ {id:"amis",g:"4+",t:"Entre amis",s:"La bande au complet"},
+ {id:"famille",g:"+ kids",t:"En famille",s:"Avec les enfants"}
+];
+const WHO_LABEL={solo:"Pour vous",couple:"En amoureux",amis:"Entre amis",famille:"En famille"};
+const AGES=["0-3 ans","4-6 ans","7-11 ans","12-17 ans","18 ans et + (jeune adulte)"];
+const YA="18 ans et + (jeune adulte)";
+const ageOk=e=>S.ages.some(a=>a===YA?(!e.ages||e.ages.includes("12-17 ans")):(e.ages&&e.ages.includes(a)));
+const DUELS=[
+ {id:"mood",a:["rire","Rire aux larmes"],b:["emotion","Avoir des frissons"]},
+ {id:"size",a:["grand","Grande salle, gros show"],b:["intime","Petite salle, ambiance"]},
+ {id:"style",a:["classique","Valeurs sûres"],b:["decouverte","Découvrir des talents"]}
+];
+const MOMENTS=[["semaine","Soirs de semaine"],["we_jour","Week-end en journée"],["we_soir","Week-end en soirée"]];
+const BUDGET=[["eco","Moins de 25 €"],["mid","25 à 60 €"],["plus","On se fait plaisir"]];
+
+// Programmation réelle relevée le 20 octobre 2026 (Offi, Sortiraparis, Infoconcert, Agenda culturel, evous).
+// Les dates sont sourcées ; quand les jours ou l'heure exacts ne sont pas publiés, approx = true ("à vérifier").
+const W=[1,2,3,4,5,6,0], WE=[6,0], SOIR=[2,3,4,5,6], SOIRD=[2,3,4,5,6,0];
+const SRC={
+ acc:"https://www.infoconcert.com/salle/accor-arena-paris-709/concerts",
+ su:"https://www.offi.fr/theatre/stand-up.html",
+ th:"https://www.sortiraparis.com/en/what-to-see-in-paris/theater/guides/154425-theatre-shows-to-see-in-paris-in-november-2026-our-pick-of-the-moment-s-performances",
+ kids:"https://www.sortiraparis.com/enfant-famille/guides/150541-toussaint-2026-a-paris-les-spectacles-a-voir-en-famille-avec-les-enfants",
+ salons:"https://paris.evous.fr/salons/novembre/",
+ shrek:"https://www.offi.fr/enfants/les-folies-bergere-2331/shrek-le-musical-104778.html",
+ lion:"https://75.agendaculturel.fr/theatre/le-roi-lion-saison-6.html",
+ indo:"https://www.sortiraparis.com/en/what-to-see-in-paris/concerts-music-festival/articles/348350-indochine-to-play-three-shows-at-la-seine-musicale-in-paris-in-november-2026"
+};
+const C=(id,t,date,price,o={})=>({id,t,cat:"concert",venue:"Accor Arena, Paris 12e",city:"Paris",price,aud:["solo","couple","amis"],mood:"emotion",size:"grand",style:"classique",ages:null,dates:[].concat(date),time:"20:00",approx:true,src:SRC.acc,d:"Concert à l'Accor Arena, la plus grande salle couverte de Paris.",...o});
+const R=(from,to,days,time,alt)=>({from,to,days,time,alt});
+const EVENTS=[
+ C(1,"Bigflo & Oli","2026-10-20",50,{aud:["amis","famille","couple"],ages:["12-17 ans"]}),
+ C(2,"Korn","2026-10-23",69.7,{aud:["amis","solo"]}),
+ C(3,"Meryl","2026-10-26",45,{style:"decouverte"}),
+ C(4,"Duran Duran","2026-10-28",62),
+ C(5,"Jungle","2026-10-30",51,{style:"decouverte",aud:["amis","couple"]}),
+ C(6,"The World of Hans Zimmer","2026-11-02",71.5,{aud:["couple","famille","amis","solo"],ages:["7-11 ans","12-17 ans"],d:"Les musiques de films de Hans Zimmer jouées en grand format, orchestre et chœur, à l'Accor Arena."}),
+ C(7,"Niall Horan","2026-11-06",56.5,{aud:["amis","famille"],ages:["12-17 ans"]}),
+ C(8,"Fontaines D.C.","2026-11-13",57.5,{style:"decouverte"}),
+ C(9,"Vanessa Paradis","2026-11-17",35,{aud:["couple","solo","amis"]}),
+ C(10,"Christophe Maé",["2026-11-19","2026-11-20"],40,{aud:["couple","famille","amis"],ages:["7-11 ans","12-17 ans"],mood:"rire"}),
+ C(11,"Hatsune Miku","2026-11-22",62,{aud:["amis","famille"],ages:["12-17 ans"],style:"decouverte",d:"Concert de la chanteuse virtuelle japonaise, projetée en hologramme et accompagnée de musiciens live."}),
+ C(12,"Superbus","2026-11-24",40,{mood:"rire",aud:["amis","couple"]}),
+ C(13,"Placebo","2026-11-25",64.2),
+ C(14,"Indochine",["2026-11-26","2026-11-27","2026-11-28"],null,{venue:"La Seine Musicale, île Seguin",city:"Boulogne-Billancourt",src:SRC.indo,d:"Trois soirs d'Indochine à La Seine Musicale, sur l'île Seguin. Prix et horaires à vérifier."}),
+ {id:15,t:"Panayotis Pascot · Entre les deux",cat:"humour",venue:"Dôme de Paris – Palais des Sports",city:"Paris",price:null,aud:["solo","couple","amis"],mood:"rire",size:"grand",style:"classique",ages:null,dates:["2026-11-06","2026-11-07"],time:"20:00",approx:true,src:SRC.su,d:"Le stand-up intime et introspectif de Panayotis Pascot, en grande salle pour deux soirs."},
+ {id:16,t:"Jérémy Charbonnel · Seul tout",cat:"humour",venue:"Théâtre des Mathurins, Paris 8e",city:"Paris",price:24,aud:["solo","couple","amis"],mood:"rire",size:"intime",style:"decouverte",ages:null,run:R("2026-10-06","2026-12-29",SOIR,"21:00"),approx:true,src:SRC.su,d:"Seul en scène de Jérémy Charbonnel. Places de 24 à 35 €."},
+ {id:17,t:"Paul de Saint Sernin",cat:"humour",venue:"Théâtre de la Madeleine, Paris 8e",city:"Paris",price:45,aud:["couple","amis","solo"],mood:"rire",size:"grand",style:"classique",ages:null,run:R("2026-10-16","2026-12-19",SOIR,"21:00"),approx:true,src:SRC.su,d:"Le nouveau spectacle de Paul de Saint Sernin, à la Madeleine jusqu'au 19 décembre."},
+ {id:18,t:"Morgane Cadignan · La nuit je mens",cat:"humour",venue:"L'Européen, Paris 17e",city:"Paris",price:18.5,aud:["solo","couple","amis"],mood:"rire",size:"intime",style:"decouverte",ages:null,run:R("2026-09-19","2026-11-25",SOIR,"21:00"),approx:true,src:SRC.su,d:"Stand-up de Morgane Cadignan. Places de 18,50 à 27 €, dernières dates fin novembre."},
+ {id:19,t:"Alexis Le Rossignol · Chamboulé",cat:"humour",venue:"Gaîté Rive Gauche, Paris 14e",city:"Paris",price:22,aud:["solo","couple","amis"],mood:"rire",size:"intime",style:"decouverte",ages:null,run:R("2026-09-25","2027-01-02",SOIR,"21:00"),approx:true,src:SRC.su,d:"Le nouveau seul en scène d'Alexis Le Rossignol. Places de 22 à 36,50 €."},
+ {id:20,t:"Blandine Lehout · La Vie de ta mère",cat:"humour",venue:"Théâtre des Mathurins, Paris 8e",city:"Paris",price:20,aud:["solo","couple","amis"],mood:"rire",size:"intime",style:"decouverte",ages:null,run:R("2026-09-25","2026-12-19",SOIR,"19:00"),approx:true,src:SRC.su,d:"Stand-up de Blandine Lehout. Places de 20 à 42 €."},
+ {id:21,t:"Broadway Comedy Club",cat:"humour",venue:"Broadway Comedy Club, Paris 2e",city:"Paris",price:14.3,aud:["amis","couple","solo"],mood:"rire",size:"intime",style:"decouverte",ages:null,run:R("2026-05-26","2027-05-30",W,"20:00"),approx:true,src:SRC.su,d:"Cinq humoristes chaque soir, dont les noms restent secrets jusqu'au dernier moment."},
+ {id:22,t:"Mathieu Madenian · À pleurer de rire",cat:"humour",venue:"Le Solo, Paris",city:"Paris",price:null,aud:["solo","couple","amis"],mood:"rire",size:"intime",style:"classique",ages:null,run:R("2026-10-01","2026-11-07",SOIR,"21:00"),approx:true,src:SRC.su,d:"Mathieu Madenian sur la scène du Solo, jusqu'au 7 novembre."},
+ {id:23,t:"Le Père",cat:"theatre",venue:"Théâtre Édouard VII, Paris 9e",city:"Paris",price:null,aud:["couple","solo"],mood:"emotion",size:"grand",style:"classique",ages:null,run:R("2026-09-15","2027-01-10",SOIRD,"20:00",{0:"16:00"}),approx:true,src:SRC.th,d:"La pièce de Florian Zeller sur un père qui perd pied. Matinée le dimanche à 16 h ; à partir du 26 novembre, les soirées passent à 21 h."},
+ {id:24,t:"Edmond",cat:"theatre",venue:"Théâtre du Palais-Royal, Paris 1er",city:"Paris",price:null,aud:["couple","famille","amis","solo"],mood:"rire",size:"grand",style:"classique",ages:["12-17 ans"],run:R("2026-10-02","2027-01-31",SOIRD,"20:30",{0:"15:00"}),approx:true,src:SRC.th,d:"Le retour de la comédie d'Alexis Michalik sur la création de Cyrano de Bergerac."},
+ {id:25,t:"Amadeus",cat:"theatre",venue:"Théâtre Marigny, Paris 8e",city:"Paris",price:null,aud:["couple","solo"],mood:"emotion",size:"grand",style:"classique",ages:null,run:R("2026-10-07","2027-01-31",SOIRD,"20:30",{0:"15:00"}),approx:true,src:SRC.th,d:"La rivalité entre Mozart et Salieri, d'après la pièce de Peter Shaffer."},
+ {id:26,t:"Le Mariage de Figaro",cat:"theatre",venue:"Théâtre de la Porte Saint-Martin, Paris 10e",city:"Paris",price:null,aud:["couple","solo","famille"],mood:"rire",size:"grand",style:"classique",ages:["12-17 ans"],run:R("2026-09-26","2027-01-03",SOIRD,"20:30",{0:"16:00"}),approx:true,src:SRC.th,d:"La comédie de Beaumarchais, jusqu'au 3 janvier."},
+ {id:27,t:"Berlin Berlin",cat:"theatre",venue:"Théâtre des Nouveautés, Paris 2e",city:"Paris",price:null,aud:["couple","amis"],mood:"rire",size:"grand",style:"classique",ages:null,run:R("2026-09-17","2027-01-03",SOIRD,"21:00",{0:"16:00"}),approx:true,src:SRC.th,d:"Comédie de boulevard dans le Berlin de la guerre froide."},
+ {id:28,t:"Le Sens de l'humour",cat:"theatre",venue:"Théâtre Antoine, Paris 10e",city:"Paris",price:null,aud:["couple","amis","solo"],mood:"rire",size:"grand",style:"classique",ages:null,run:R("2026-09-16","2027-01-10",SOIRD,"21:00",{0:"16:00"}),approx:true,src:SRC.th,d:"Comédie au Théâtre Antoine, jusqu'au 10 janvier."},
+ {id:29,t:"La Vie devant soi",cat:"theatre",venue:"Studio des Champs-Élysées, Paris 8e",city:"Paris",price:null,aud:["couple","solo"],mood:"emotion",size:"intime",style:"classique",ages:null,run:R("2026-10-22","2026-12-20",SOIRD,"19:00",{0:"16:00"}),approx:true,src:SRC.th,d:"Adaptation du roman de Romain Gary, Momo et Madame Rosa à Belleville."},
+ {id:30,t:"Novecento",cat:"theatre",venue:"Théâtre des Mathurins, Paris 8e",city:"Paris",price:null,aud:["couple","solo"],mood:"emotion",size:"intime",style:"classique",ages:null,run:R("2026-09-01","2026-12-17",[4],"21:00"),src:SRC.th,d:"Le monologue d'Alessandro Baricco sur un pianiste né sur un paquebot. Le jeudi à 21 h."},
+ {id:31,t:"La Prière aux Étoiles",cat:"theatre",venue:"Théâtre Montansier",city:"Versailles",price:null,aud:["couple","solo","famille"],mood:"emotion",size:"intime",style:"decouverte",ages:["12-17 ans"],run:R("2026-10-28","2026-11-08",SOIRD,"20:30",{0:"15:00"}),approx:true,src:SRC.th,d:"Au Montansier de Versailles, pour deux semaines seulement."},
+ {id:32,t:"Napoléon",cat:"theatre",venue:"Poche-Montparnasse, Paris 6e",city:"Paris",price:null,aud:["solo","couple"],mood:"emotion",size:"intime",style:"classique",ages:null,run:R("2026-08-31","2027-01-25",[1],"19:00"),src:SRC.th,d:"Seul en scène historique, le lundi à 19 h."},
+ {id:33,t:"Relationshit",cat:"theatre",venue:"Studio Hébertot, Paris 17e",city:"Paris",price:null,aud:["couple","amis"],mood:"rire",size:"intime",style:"decouverte",ages:["12-17 ans"],run:R("2026-10-22","2026-12-05",SOIR,"21:00"),approx:true,src:SRC.th,d:"Comédie sur le couple, à partir de 12 ans."},
+ {id:34,t:"Ta mère et moi",cat:"theatre",venue:"Théâtre de Paris – Salle Réjane, Paris 9e",city:"Paris",price:null,aud:["solo","couple"],mood:"emotion",size:"intime",style:"decouverte",ages:null,run:R("2026-10-26","2026-12-31",SOIR,"19:00"),approx:true,src:SRC.th,d:"Seul en scène, à l'affiche à partir du 26 octobre."},
+ {id:35,t:"Shrek Le Musical",cat:"musical",venue:"Folies Bergère, Paris 9e",city:"Paris",price:41,aud:["famille","couple","amis"],mood:"rire",size:"grand",style:"classique",ages:["4-6 ans","7-11 ans","12-17 ans"],run:R("2026-10-02","2027-01-20",[3,4,5,6,0],"20:00",{3:"15:00",6:"15:00",0:"15:00"}),approx:true,src:SRC.shrek,d:"La comédie musicale tirée du film, avec Chantal Ladesou. Dès 3 ans, de 41 à 72 €."},
+ {id:36,t:"Le Roi Lion",cat:"musical",venue:"Théâtre Mogador, Paris 9e",city:"Paris",price:20,aud:["famille","couple","amis","solo"],mood:"emotion",size:"grand",style:"classique",ages:["4-6 ans","7-11 ans","12-17 ans"],run:R("2026-09-25","2027-08-08",SOIRD,"20:00",{6:"15:00",0:"15:00"}),approx:true,src:SRC.lion,d:"Sixième saison à Mogador : une cinquantaine d'artistes, plus de 200 masques et marionnettes. 1 h 37, dès 20 €."},
+ {id:37,t:"Singin' in the Rain",cat:"musical",venue:"Théâtre du Lido, Paris 8e",city:"Paris",price:null,aud:["couple","famille","amis"],mood:"rire",size:"grand",style:"classique",ages:["7-11 ans","12-17 ans"],run:R("2026-09-17","2027-01-31",SOIRD,"20:00",{6:"15:00",0:"15:00"}),approx:true,src:SRC.kids,d:"La comédie musicale culte adaptée sur la scène du Lido."},
+ {id:38,t:"Les Vilaines",cat:"musical",venue:"Gaîté Montparnasse, Paris 14e",city:"Paris",price:null,aud:["amis","couple"],mood:"rire",size:"intime",style:"decouverte",ages:null,run:R("2026-09-30","2027-06-16",SOIR,"21:00"),approx:true,src:SRC.th,d:"Comédie musicale déjantée, à l'affiche jusqu'en juin 2027."},
+ {id:39,t:"Ménopause",cat:"musical",venue:"Apollo Théâtre, Paris 11e",city:"Paris",price:null,aud:["amis","couple"],mood:"rire",size:"intime",style:"classique",ages:null,run:R("2026-09-01","2027-06-30",SOIR,"21:00"),approx:true,src:SRC.th,d:"Comédie musicale à succès, prolongée jusqu'au 30 juin 2027."},
+ {id:40,t:"Oliver Twist",cat:"musical",venue:"Lucernaire, Paris 6e",city:"Paris",price:null,aud:["famille","couple"],mood:"emotion",size:"intime",style:"classique",ages:["7-11 ans","12-17 ans"],run:R("2026-09-09","2026-12-31",[3,6,0],"15:00"),approx:true,src:SRC.kids,d:"Le roman de Dickens en comédie musicale, au Lucernaire."},
+ {id:41,t:"Pourquoi Pourquoi ?",cat:"jeune",venue:"Théâtre Michel, Paris 8e",city:"Paris",price:null,aud:["famille"],mood:"rire",size:"intime",style:"decouverte",ages:["7-11 ans"],run:R("2026-10-10","2027-01-31",[3,6,0],"14:00"),approx:true,src:SRC.kids,d:"Spectacle jeune public, dès 6 ans."},
+ {id:42,t:"Arsène Lupin",cat:"theatre",venue:"Théâtre Le Ranelagh, Paris 16e",city:"Paris",price:null,aud:["famille","couple"],mood:"rire",size:"intime",style:"classique",ages:["7-11 ans","12-17 ans"],run:R("2026-09-17","2027-01-17",[3,6,0],"15:00"),approx:true,src:SRC.kids,d:"Comédie policière autour du gentleman cambrioleur, dès 7 ans."},
+ {id:43,t:"Les Histoires de Toto",cat:"jeune",venue:"La Scène Montparnasse, Paris 14e",city:"Paris",price:null,aud:["famille"],mood:"rire",size:"intime",style:"decouverte",ages:["4-6 ans","7-11 ans"],runs:[R("2026-10-17","2026-11-01",W,"14:30"),R("2026-11-02","2027-01-31",WE,"14:30")],src:SRC.kids,d:"Dès 3 ans. Samedi et dimanche à 14 h 30, et presque tous les jours pendant les vacances de la Toussaint."},
+ {id:44,t:"Potted Potter",cat:"theatre",venue:"Théâtre du Gymnase, Paris 10e",city:"Paris",price:null,aud:["famille","amis","couple"],mood:"rire",size:"grand",style:"decouverte",ages:["7-11 ans","12-17 ans"],run:R("2026-10-17","2027-01-17",[3,4,5,6,0],"19:00",{6:"15:00",0:"15:00"}),approx:true,src:SRC.th,d:"Parodie : les sept tomes de Harry Potter en 70 minutes, par deux comédiens."},
+ {id:45,t:"Renversante",cat:"theatre",venue:"Théâtre des Mathurins, Paris 8e",city:"Paris",price:null,aud:["famille"],mood:"emotion",size:"intime",style:"decouverte",ages:["7-11 ans","12-17 ans"],run:R("2026-09-01","2026-12-15",[3,6,0],"14:00"),approx:true,src:SRC.th,d:"Théâtre familial dès 8 ans, suivi d'un échange avec le public."},
+ {id:46,t:"Chevaliers, Princesse et Dragon",cat:"jeune",venue:"Théâtre des Mathurins, Paris 8e",city:"Paris",price:null,aud:["famille"],mood:"rire",size:"intime",style:"classique",ages:["4-6 ans","7-11 ans"],runs:[R("2026-10-17","2026-11-01",W,"11:00"),R("2026-11-02","2027-06-30",WE,"11:00")],approx:true,src:SRC.kids,d:"Spectacle pour enfants joué le week-end et pendant les vacances scolaires."},
+ {id:47,t:"Babel · Mourad Merzouki",cat:"danse",venue:"Le Bon Marché Rive Gauche, Paris 7e",city:"Paris",price:null,aud:["couple","amis","solo","famille"],mood:"emotion",size:"intime",style:"decouverte",ages:["12-17 ans"],run:R("2026-09-03","2026-12-31",[4,5,6],"20:00"),approx:true,src:SRC.kids,d:"Danse hip-hop dans le grand magasin, le jeudi, vendredi et samedi soir après la fermeture."},
+ {id:48,t:"Nuits de Lumière",cat:"festival",venue:"Château de Vincennes",city:"Vincennes",price:null,aud:["famille","couple","amis"],mood:"emotion",size:"grand",style:"decouverte",ages:["4-6 ans","7-11 ans","12-17 ans"],run:R("2026-10-15","2026-11-08",W,"19:00"),approx:true,src:SRC.kids,d:"Parcours lumineux nocturne au château de Vincennes, jusqu'au 8 novembre."},
+ {id:49,t:"Festival Yvelines Théâtre",cat:"festival",venue:"Communes des Yvelines",city:"Yvelines",price:0,aud:["famille","couple","amis","solo"],mood:"rire",size:"intime",style:"decouverte",ages:["4-6 ans","7-11 ans","12-17 ans"],run:R("2026-10-16","2026-11-15",W,"15:00"),approx:true,src:SRC.th,d:"50 représentations gratuites dans les Yvelines : théâtre, cirque, magie, marionnettes."},
+ {id:50,t:"Salon du Chocolat et de la Pâtisserie",cat:"salon",venue:"Paris Expo Porte de Versailles",city:"Paris",price:16,aud:["famille","couple","amis","solo"],mood:"rire",size:"grand",style:"classique",ages:["4-6 ans","7-11 ans","12-17 ans"],run:R("2026-10-28","2026-11-01",W,"10:00"),approx:true,src:SRC.salons,d:"Adulte 16 € puis 20 € à partir du 31 octobre, enfant 8 €, gratuit pour les moins de 6 ans."},
+ {id:51,t:"Salon international du patrimoine culturel",cat:"salon",venue:"Salles du Carrousel, Paris 1er",city:"Paris",price:17,aud:["couple","solo"],mood:"emotion",size:"grand",style:"classique",ages:null,run:R("2026-10-29","2026-11-01",W,"10:00"),approx:true,src:SRC.salons,d:"Artisans d'art et métiers du patrimoine. 17 € en prévente, gratuit pour les moins de 12 ans."},
+ {id:52,t:"Marjolaine",cat:"salon",venue:"Parc Floral de Paris, Paris 12e",city:"Paris",price:10,aud:["couple","famille","solo"],mood:"rire",size:"grand",style:"classique",ages:["4-6 ans","7-11 ans","12-17 ans"],run:R("2026-11-07","2026-11-11",W,"10:00"),approx:true,src:SRC.salons,d:"Le salon bio et nature du Parc Floral. 10 €, gratuit pour les moins de 12 ans."},
+ {id:53,t:"Y/CON 12",cat:"salon",venue:"Paris Montreuil Expo",city:"Montreuil",price:18,aud:["amis","famille"],mood:"rire",size:"grand",style:"decouverte",ages:["12-17 ans"],run:R("2026-11-07","2026-11-08",W,"10:00"),approx:true,src:SRC.salons,d:"Convention pop culture, à partir de 14 ans."},
+ {id:54,t:"MIF Expo · Made in France",cat:"salon",venue:"Paris Expo Porte de Versailles",city:"Paris",price:0,aud:["couple","solo","famille"],mood:"rire",size:"grand",style:"decouverte",ages:null,run:R("2026-11-12","2026-11-15",W,"10:00"),approx:true,src:SRC.salons,d:"Le salon du fabriqué en France. Gratuit sur préinscription, 10 € sur place remboursés au premier achat."},
+ {id:55,t:"Paris Photo",cat:"salon",venue:"Grand Palais, Paris 8e",city:"Paris",price:36,aud:["couple","solo","amis"],mood:"emotion",size:"grand",style:"classique",ages:null,run:R("2026-11-12","2026-11-15",W,"12:00"),approx:true,src:SRC.salons,d:"La grande foire de la photographie. 36 € en semaine, 41 € le week-end, billets en ligne uniquement."},
+ {id:56,t:"Créations & savoir-faire",cat:"salon",venue:"Paris Expo Porte de Versailles",city:"Paris",price:15,aud:["famille","couple","amis","solo"],mood:"rire",size:"grand",style:"classique",ages:["7-11 ans","12-17 ans"],run:R("2026-11-18","2026-11-22",W,"10:00"),approx:true,src:SRC.salons,d:"Loisirs créatifs et ateliers. 15 € en prévente, 9 € pour les 6-12 ans."},
+ {id:57,t:"Histoire de Lire",cat:"salon",venue:"Plusieurs sites de Versailles",city:"Versailles",price:null,aud:["famille","couple","solo"],mood:"emotion",size:"intime",style:"decouverte",ages:["7-11 ans","12-17 ans"],run:R("2026-11-21","2026-11-22",W,"10:00"),approx:true,src:SRC.salons,d:"Salon du livre d'histoire à Versailles. Billet à réserver en ligne."},
+ {id:58,t:"Salon du livre et de la presse jeunesse",cat:"salon",venue:"Paris Montreuil Expo",city:"Montreuil",price:0,aud:["famille"],mood:"rire",size:"grand",style:"classique",ages:["0-3 ans","4-6 ans","7-11 ans","12-17 ans"],run:R("2026-11-25","2026-11-30",W,"10:00"),approx:true,src:SRC.salons,d:"Le grand salon du livre jeunesse. Gratuit, billet obligatoire même pour les enfants."},
+ {id:59,t:"Le Grand Tasting",cat:"salon",venue:"Salles du Carrousel, Paris 1er",city:"Paris",price:43,aud:["couple","amis","solo"],mood:"rire",size:"grand",style:"classique",ages:null,run:R("2026-11-27","2026-11-28",W,"11:00"),approx:true,src:SRC.salons,d:"Dégustation de grands vins avec les vignerons. 43 € la journée, en ligne."}
+];
+
+// Opéra de Paris et Candlelight (relevés le 20 octobre 2026)
+SRC.opera="https://mag.agendaculturel.fr/blog/guides/tout-savoir-sur-la-saison-de-l-opera-de-paris.html";
+SRC.opsite="https://www.operadeparis.fr/";
+SRC.candle="https://the-place-to-be.fr/evenement/les-concerts-a-la-bougie-candlelight-reviennent-a-paris/";
+SRC.tours="https://mag.agendaculturel.fr/blog/tournees/tournees-annoncees-dates-et-billetteries.html";
+SRC.onsale="https://concerts.paris/mises-en-vente";
+const JEUNES=" Certaines avant-premières sont à 10 € pour les moins de 28 ans.";
+const OP=(id,t,cat,salle,from,to,price,d,o={})=>({id,t,cat,venue:salle==="G"?"Palais Garnier, Paris 9e":"Opéra Bastille, Paris 12e",city:"Paris",price,aud:["couple","solo","amis"],mood:"emotion",size:"grand",style:"classique",ages:null,run:R(from,to,SOIRD,"19:30",{0:"14:30"}),approx:true,src:SRC.opera,site:SRC.opsite,serie:"Opéra de Paris",artists:["Opéra de Paris"],d:d+JEUNES,...o});
+const CL=(id,t,artists,slots,price)=>({id,t:"Candlelight · "+t,cat:"concert",venue:"Chapelle de la Trinité, Paris",city:"Paris",price,aud:["couple","amis","solo","famille"],mood:"emotion",size:"intime",style:"classique",ages:["7-11 ans","12-17 ans"],dates:Object.keys(slots),times:slots,approx:false,src:SRC.candle,serie:"Candlelight",artists,d:"Concert à la lueur des bougies : le répertoire de "+artists.join(" et ")+" réarrangé pour musiciens classiques. Prix variable selon la date."});
+EVENTS.push(
+ OP(60,"L'Histoire de Manon","danse","G","2026-09-28","2026-10-30",10,"Le ballet de Kenneth MacMillan. Places de 10 à 175 €.",{aud:["couple","solo","famille"],ages:["12-17 ans"]}),
+ OP(61,"Paysages intérieurs","danse","G","2026-10-11","2026-11-07",null,"Soirée de ballets signés Maillot, Forsythe et Barton, nouvelle production.",{style:"decouverte"}),
+ OP(62,"Le Barbier de Séville","opera","B","2026-09-12","2026-11-05",null,"L'opéra de Rossini mis en scène par Damiano Michieletto.",{mood:"rire",aud:["couple","solo","amis","famille"],ages:["12-17 ans"]}),
+ OP(63,"Festival Ring","opera","B","2026-11-06","2026-11-19",160,"Les quatre opéras du Ring de Wagner : L'Or du Rhin, La Walkyrie, Siegfried, Le Crépuscule des dieux. De 160 à 1 080 € les quatre soirs.",{aud:["solo","couple"],run:R("2026-11-06","2026-11-19",SOIRD,"18:00",{0:"14:00"})}),
+ OP(64,"La Clémence de Titus","opera","G","2026-11-24","2026-12-25",null,"L'opéra de Mozart mis en scène par Willy Decker."),
+ OP(65,"Turandot","opera","B","2026-11-27","2026-12-27",17,"L'opéra de Puccini mis en scène par Robert Wilson. De 17 à 225 €.",{aud:["couple","solo","amis","famille"],ages:["12-17 ans"]}),
+ CL(70,"Queen et The Beatles",["Queen","The Beatles"],{"2026-10-22":"19:00","2026-11-26":"21:00"},19),
+ CL(71,"Coldplay et Imagine Dragons",["Coldplay","Imagine Dragons"],{"2026-10-22":"21:00","2026-11-07":"21:00","2026-11-26":"19:00"},23),
+ CL(72,"Hommage à Johnny Hallyday",["Johnny Hallyday"],{"2026-10-23":"19:00"},19),
+ CL(73,"Hommage à Queen",["Queen"],{"2026-10-23":"21:00","2026-11-28":"21:00"},23),
+ CL(74,"Hommage à Michael Jackson",["Michael Jackson"],{"2026-10-24":"19:00","2026-11-27":"21:00"},28.5),
+ CL(75,"Hommage à Jean-Jacques Goldman",["Jean-Jacques Goldman"],{"2026-10-24":"21:00","2026-11-29":"20:00"},21),
+ CL(76,"Hommage à Céline Dion",["Céline Dion"],{"2026-10-25":"18:00","2026-11-28":"19:00"},22.5),
+ CL(77,"Hommage à Hans Zimmer",["Hans Zimmer"],{"2026-10-25":"20:00","2026-11-08":"20:00","2026-11-27":"19:00"},21),
+ CL(78,"Hommage à Charles Aznavour",["Charles Aznavour"],{"2026-11-07":"19:00"},26.5),
+ CL(79,"Hommage à ABBA",["ABBA"],{"2026-11-08":"18:00"},20),
+ CL(80,"Pink Floyd",["Pink Floyd"],{"2026-11-21":"19:00"},19),
+ CL(81,"Hommage à Ludovico Einaudi",["Ludovico Einaudi"],{"2026-11-21":"21:00","2026-11-22":"20:00"},19),
+ CL(82,"Mozart et Chopin",["Mozart","Chopin"],{"2026-11-22":"18:00"},21),
+ CL(83,"Hommage à Ariana Grande",["Ariana Grande"],{"2026-11-29":"18:00"},29)
+);
+EVENTS.find(e=>e.id===6).artists=["Hans Zimmer"];
+
+
+// Expositions (relevées le 24 octobre 2026). Jours d'ouverture indicatifs : à vérifier auprès du lieu.
+SRC.expo="https://paris.evous.fr/musees/expositions/";
+SRC.expo2="https://www.sortiraparis.com/en/what-to-visit-in-paris/exhibit-museum/guides/278168-autumn-2026-exhibitions-to-visit-in-paris-and-ile-de-france";
+SRC.expok="https://www.sortiraparis.com/en/child-and-family/guides/181539-15-kid-friendly-exhibitions-to-visit-in-paris-right-now";
+const NOTUE=[1,3,4,5,6,0], NOMON=[2,3,4,5,6,0];
+const EX=(id,t,venue,city,from,to,days,price,d,o={})=>({id,t,cat:"expo",venue,city,price,aud:["solo","couple","amis"],mood:"emotion",size:"grand",style:"classique",ages:null,run:R(from,to,days,"10:00"),approx:true,src:SRC.expo,serie:"Expositions",d,...o});
+const KIDS=["4-6 ans","7-11 ans","12-17 ans"], TEENS=["12-17 ans"];
+EVENTS.push(
+ EX(90,"Zurbarán","Musée du Louvre, Paris 1er","Paris","2026-10-07","2027-01-25",NOTUE,22,"La grande rétrospective du peintre espagnol, hall Napoléon. 22 € pour les résidents de l'Espace économique européen."),
+ EX(91,"Mary Cassatt. L'indépendante","Musée d'Orsay, Paris 7e","Paris","2026-10-06","2027-01-31",NOMON,14,"La peintre impressionniste américaine. 14 € sur place, 16 € en ligne.",{aud:["solo","couple","amis","famille"],ages:TEENS}),
+ EX(92,"Monet. Peindre le temps","Musée de l'Orangerie, Paris 1er","Paris","2026-09-30","2027-01-25",NOTUE,11,"Monet et la lumière qui change. 11 € sur place, 12,50 € en ligne.",{aud:["solo","couple","amis","famille"],ages:["7-11 ans","12-17 ans"]}),
+ EX(93,"Cezanne et nous","Grand Palais, Paris 8e","Paris","2026-09-23","2027-01-17",W,16,"Cézanne et les artistes qui s'en inspirent. 19 €, tarif réduit 16 €.",{aud:["solo","couple","amis","famille"],ages:TEENS}),
+ EX(94,"Gustave Fayet. Collectionneur, créateur","Fondation Louis Vuitton, Paris 16e","Paris","2026-10-09","2027-03-08",NOTUE,18,"Le collectionneur et artiste Gustave Fayet. Nocturne le vendredi 6 novembre de 19 h à 23 h."),
+ EX(95,"Andy Warhol. La ligne et l'image","Musée du Luxembourg, Paris 6e","Paris","2026-09-16","2027-01-10",W,10,"Warhol dessinateur et faiseur d'images. 14 €, tarif réduit 10 €.",{aud:["solo","couple","amis","famille"],ages:TEENS,style:"decouverte"}),
+ EX(96,"Kerry James Marshall","Musée d'Art moderne de Paris, Paris 16e","Paris","2026-09-18","2027-01-24",NOMON,15,"Grande exposition du peintre américain. 17 €, tarif réduit 15 €.",{style:"decouverte"}),
+ EX(97,"Remember Me","Bourse de Commerce, Paris 1er","Paris","2026-10-07","2027-01-18",NOTUE,10,"Exposition de la Collection Pinault. 15 €, 10 € pour les 18-26 ans.",{style:"decouverte"}),
+ EX(98,"Look ! 40 ans de mode au musée","Musée des Arts décoratifs, Paris 1er","Paris","2026-09-30","2027-04-04",NOMON,18,"Quarante ans de mode vus par le musée. Billet à 18 €.",{aud:["solo","couple","amis","famille"],ages:TEENS}),
+ EX(99,"Premières Nations","Musée du quai Branly, Paris 7e","Paris","2026-09-29","2027-01-17",NOMON,11,"Les cultures autochtones d'Amérique du Nord. 14 €, tarif réduit 11 €.",{aud:["solo","couple","famille"],ages:["7-11 ans","12-17 ans"]}),
+ EX(100,"Artistes au Muséum","Grande Galerie de l'Évolution, Paris 5e","Paris","2026-09-23","2027-03-07",NOTUE,13,"Des artistes investissent la Grande Galerie de l'Évolution. 16 €, tarif réduit 13 €.",{aud:["famille","couple","solo"],ages:KIDS,mood:"rire"}),
+ EX(101,"Chiens et chats","Cité des sciences et de l'industrie, Paris 19e","Paris","2025-02-18","2027-03-07",NOMON,4,"Tout sur nos animaux de compagnie, pour petits et grands. 15 €, réduit 12 €, 4 € pour les 2-5 ans.",{aud:["famille"],ages:["0-3 ans","4-6 ans","7-11 ans"],mood:"rire"}),
+ EX(102,"Cap sur l'IA !","Musée de l'Air et de l'Espace","Le Bourget","2026-10-15","2027-06-27",NOMON,14,"Comprendre l'intelligence artificielle dans l'aéronautique. 17 €, réduit 14 €.",{aud:["famille","amis","solo"],ages:["7-11 ans","12-17 ans"],style:"decouverte"}),
+ EX(103,"Marie-Antoinette de Sofia Coppola","Petit Trianon, château de Versailles","Versailles","2026-09-22","2027-01-24",NOMON,12,"Le film de Sofia Coppola mis en scène au Petit Trianon. 15 €, 12 € pour les résidents de l'EEE.",{aud:["couple","amis","solo","famille"],ages:TEENS}),
+ EX(104,"Stan Douglas. Parallax","Jeu de Paume, Paris 8e","Paris","2026-10-20","2027-01-10",NOMON,9.5,"Le photographe et vidéaste canadien. 14 €, tarif réduit 9,50 €.",{style:"decouverte"}),
+ EX(105,"Toi et ta bande","Palais de Tokyo, Paris 16e","Paris","2026-10-21","2027-02-14",[1,3,4,5,6,0],9,"Exposition collective de la saison d'automne. 13 €, tarif réduit 9 €.",{style:"decouverte",run:R("2026-10-21","2027-02-14",[1,3,4,5,6,0],"12:00")}),
+ EX(106,"Ibrahim Mahama. Le Temps des récoltes","Fondation Cartier, Paris","Paris","2026-10-22","2027-02-28",NOMON,10,"L'artiste ghanéen à la Fondation Cartier. 15 €, tarif réduit 10 €.",{style:"decouverte",run:R("2026-10-22","2027-02-28",NOMON,"11:00")}),
+ EX(107,"Louvre Photo","Musée du Louvre, Paris 1er","Paris","2026-11-04","2027-05-03",NOTUE,22,"La photographie au Louvre, mezzanine Napoléon. 22 € pour les résidents de l'EEE.",{style:"decouverte"}),
+ EX(108,"Bruxelles 1900","Petit Palais, Paris 8e","Paris","2026-11-10","2027-04-25",NOMON,15,"Bruxelles, capitale de l'Art nouveau. 17 €, tarif réduit 15 €."),
+ EX(109,"Drogues","Musée de l'Homme, Paris 16e","Paris","2026-11-18","2027-06-06",NOTUE,12,"Les drogues dans l'histoire et les sociétés. 15 €, tarif réduit 12 €.",{aud:["solo","amis","couple","famille"],ages:TEENS,style:"decouverte"}),
+ EX(110,"Mimi Cracra, rétrospective Agnès Rosenstiehl","BnF François-Mitterrand, Paris 13e","Paris","2026-11-03","2027-01-25",NOMON,0,"La petite héroïne d'Agnès Rosenstiehl. Entrée gratuite.",{aud:["famille","solo"],ages:["0-3 ans","4-6 ans","7-11 ans"],mood:"rire",src:SRC.expo2}),
+ EX(111,"Planète Océan","Atelier des Lumières, Paris 11e","Paris","2026-10-16","2027-06-30",W,null,"Exposition immersive sur les océans. Date de fin et tarifs à vérifier.",{aud:["famille","couple","amis","solo"],ages:KIDS,size:"grand",style:"decouverte",src:SRC.expok}),
+ EX(112,"Contes de fées au Musée de La Poste","Musée de La Poste, Paris 15e","Paris","2026-11-18","2027-04-19",NOTUE,null,"Peau d'Âne et d'autres contes, avec un parcours pour les familles. Tarifs à vérifier.",{aud:["famille"],ages:["4-6 ans","7-11 ans"],src:SRC.expo2}),
+ EX(113,"Automne tropical","Grandes Serres du Jardin des Plantes, Paris 5e","Paris","2026-10-15","2026-11-23",W,null,"Palmiers, trésors et secrets des serres tropicales. Tarifs à vérifier.",{aud:["famille","couple","solo"],ages:KIDS,src:SRC.expok}),
+ EX(114,"Moteur Imaginaire","Le Large, île Seguin","Boulogne-Billancourt","2026-10-17","2027-03-07",NOMON,null,"Nouvelle exposition au Large, sur l'île Seguin. Tarifs à vérifier.",{aud:["famille","amis","solo","couple"],ages:KIDS,style:"decouverte",src:SRC.expok}),
+ EX(115,"Triomphe, la nuit","Arc de Triomphe, Paris 8e","Paris","2026-10-28","2027-03-26",W,null,"Une visite nocturne de l'Arc de Triomphe. Horaires et tarifs à vérifier.",{aud:["couple","amis","famille"],ages:TEENS,run:R("2026-10-28","2027-03-26",W,"19:00"),src:SRC.expo2}),
+ EX(116,"Martin Parr. Autoportrait","Saint Laurent Montaigne, Paris 8e","Paris","2026-10-15","2027-01-13",NOMON,0,"Les autoportraits du photographe britannique. Entrée gratuite.",{style:"decouverte",src:SRC.expo2})
+);
+
+// Mises en vente : soon = ouverture datée, open = en vente, partial = en partie complet, tba = date de vente non communiquée
+const ONSALE=[
+ {k:"op3",a:"Opéra de Paris",show:"3e vague : Don Pasquale, Roméo et Juliette, Idomeneo, derniers ballets",venue:"Palais Garnier et Opéra Bastille",when:"juin et juillet 2027",open:"2026-11-10",hour:"12:00",st:"soon",src:SRC.opera},
+ {k:"jj",a:"Jack Johnson",show:"Surfilmusic Tour 2027",venue:"L'Olympia",when:"lun. 28 juin 2027",open:"2026-10-22",st:"soon",pre:true,src:SRC.onsale},
+ {k:"ky",a:"Kenshi Yonezu",show:"World Tour 2026-2027 / Ghost",venue:"Accor Arena",when:"ven. 26 févr. 2027",open:"2026-10-22",st:"soon",pre:true,src:SRC.onsale},
+ {k:"ld",a:"Léa Doffey",show:"Concert",venue:"Le Trianon",when:"lun. 15 mars 2027",open:"2026-10-22",st:"soon",pre:true,src:SRC.onsale},
+ {k:"toto",a:"Toto",show:"Tournée 2027",venue:"Accor Arena",when:"jeu. 8 juil. 2027",open:"2026-10-23",st:"soon",pre:true,src:SRC.onsale},
+ {k:"dr",a:"Damien Rice",show:"0, 25th Anniversary Tour",venue:"Le Grand Rex",when:"lun. 12 avr. 2027",open:"2026-10-23",st:"soon",pre:true,src:SRC.onsale},
+ {k:"hc",a:"Hot Chip",show:"Concert",venue:"Bataclan",when:"mar. 2 mars 2027",open:"2026-10-23",st:"soon",pre:true,src:SRC.onsale},
+ {k:"df",a:"Dominic Fike",show:"Comedy Tragedy Parody",venue:"L'Olympia",when:"ven. 12 févr. 2027",open:"2026-10-23",st:"soon",pre:true,src:SRC.onsale},
+ {k:"orb",a:"Orbital",show:"Concert",venue:"Bataclan",when:"ven. 30 avr. 2027",open:"2026-10-23",st:"soon",pre:true,src:SRC.onsale},
+ {k:"shy",a:"Shygirl",show:"Concert",venue:"Élysée Montmartre",when:"mar. 16 mars 2027",open:"2026-10-23",st:"soon",pre:true,src:SRC.onsale},
+ {k:"dj",a:"Django Django",show:"Concert",venue:"La Gaîté Lyrique",when:"sam. 27 févr. 2027",open:"2026-10-23",st:"soon",pre:true,src:SRC.onsale},
+ {k:"rc",a:"Rachel Chinouriri",show:"Concert",venue:"L'Olympia",when:"mar. 22 juin 2027",open:"2026-10-23",st:"soon",pre:true,src:SRC.onsale},
+ {k:"mh",a:"Marika Hackman",show:"Concert",venue:"Le Trabendo",when:"mar. 9 mars 2027",open:"2026-10-23",st:"soon",pre:true,src:SRC.onsale},
+ {k:"art",a:"ARTSON",show:"Live acoustique",venue:"L'Européen",when:"mer. 24 févr. 2027",open:"2026-10-30",st:"soon",pre:true,src:SRC.onsale},
+ {k:"ang",a:"Angèle",show:"Instinct Tour",venue:"Accor Arena",when:"8 au 13 mars 2027",st:"partial",note:"Seul le 13 mars reste en vente, les quatre premiers soirs sont complets.",src:SRC.tours},
+ {k:"hs",a:"Harry Styles",show:"Together, Together",venue:"Plenitude Arena, Nanterre",when:"16, 17, 23 et 24 juil. 2027",st:"open",src:SRC.tours},
+ {k:"sdm",a:"SDM",show:"Stade de France",venue:"Stade de France, Saint-Denis",when:"29 et 30 mai 2027",st:"open",price:"de 42 à 149 €",src:SRC.tours},
+ {k:"kaa",a:"Kaaris",show:"Stade de France",venue:"Stade de France, Saint-Denis",when:"22 mai 2027",st:"open",src:SRC.tours},
+ {k:"zaz",a:"Zazie",show:"Volatil Tour",venue:"Zénith de Paris",when:"30 sept. 2027",st:"open",src:SRC.tours},
+ {k:"op2",a:"Opéra de Paris",show:"2e vague : Lady Macbeth de Mzensk, L'Élixir d'amour, Miroir de nos peines",venue:"Palais Garnier et Opéra Bastille",when:"saison 2026-2027",st:"open",note:"Ouverte depuis le 13 octobre à 12 h.",src:SRC.opera},
+ {k:"oas",a:"Oasis",show:"Oasis Live '27",venue:"Stade de France, Saint-Denis",when:"20 et 23 juil. 2027",st:"tba",price:"de 84 à 249 €",src:SRC.tours},
+ {k:"gims",a:"Gims",show:"Carpe Diem Tour",venue:"Plenitude Arena, Nanterre",when:"16 et 17 déc. 2026",st:"tba",src:SRC.tours},
+ {k:"vian",a:"Vianney",show:"Tournée 2027",venue:"Zénith de Paris",when:"8 au 10 avr. 2027",st:"tba",src:SRC.tours},
+ {k:"ald",a:"Aldebert",show:"Enfantillages, jamais adultes !",venue:"Accor Arena",when:"20 févr. 2027",st:"tba",fam:true,src:SRC.tours},
+ {k:"hoi",a:"Holiday on Ice",show:"Cinema of Dreams",venue:"Zénith de Paris",when:"11 févr. 2027",st:"tba",fam:true,src:SRC.tours},
+ {k:"tayc",a:"Tayc",show:"Joÿa Tour",venue:"Accor Arena",when:"1er au 3 juin 2027",st:"tba",src:SRC.tours},
+ {k:"db",a:"Dany Boon",show:"Clown n'est pas un métier !",venue:"L'Olympia",when:"27 au 29 avr. 2027",st:"tba",src:SRC.tours},
+ {k:"cw",a:"Christophe Willem",show:"Tournée des 20 ans",venue:"Accor Arena",when:"9 déc. 2027",st:"tba",src:SRC.tours},
+ {k:"gf",a:"Gaël Faye",show:"Tournée des Zéniths",venue:"Accor Arena",when:"10 déc. 2027",st:"tba",price:"de 39 à 65 € sur la tournée",src:SRC.tours}
+];
+const ARTGROUPS=[
+ ["Chanson française",["Angèle","Indochine","Christophe Maé","Vanessa Paradis","Zazie","Vianney","Gaël Faye","Superbus","Céline Dion","Jean-Jacques Goldman","Johnny Hallyday","Charles Aznavour"]],
+ ["Pop & rock",["Harry Styles","Oasis","Coldplay","Queen","Placebo","Duran Duran","Niall Horan","Jack Johnson","Damien Rice","Michael Jackson","ABBA","Pink Floyd","Toto","Ariana Grande"]],
+ ["Rap & urbain",["Bigflo & Oli","SDM","Kaaris","Gims","Tayc","Meryl"]],
+ ["Électro & indé",["Jungle","Fontaines D.C.","Hot Chip","Orbital","Shygirl","Django Django","Kenshi Yonezu"]],
+ ["Classique & musiques de films",["Opéra de Paris","Hans Zimmer","Ludovico Einaudi","Mozart"]],
+ ["En famille",["Aldebert","Holiday on Ice"]]
+];
+
+
+
+const PLUR={humour:"Prochains spectacles d'humour",theatre:"Prochaines pièces de théâtre",concert:"Prochains concerts",musical:"Prochaines comédies musicales",danse:"Prochains spectacles de danse",cirque:"Prochains cirques & magie",opera:"Prochains opéras & concerts classiques",jeune:"Prochains spectacles jeune public",salon:"Prochains salons",festival:"Prochains festivals",expo:"Expositions à voir"};
+const DEFAULT={name:"",city:"",types:[],artists:[],alerts:[],who:[],ages:[],duels:{},moments:[],budget:""};
+const S=JSON.parse(JSON.stringify(DEFAULT));
+let favs=[], onboard=0, page="accueil", dayIdx=0, detailId=null, cat="all", q="", editing=false;
+let wk=0, wkDay="both", wkMom="all", wkWho="all";
+const STEPS=6;
+try{const s=JSON.parse(localStorage.getItem("entracte2"));if(s){Object.assign(S,s.S);favs=s.favs||[];if(s.done)onboard=STEPS}}catch(e){}
+function save(){try{localStorage.setItem("entracte2",JSON.stringify({done:onboard>=STEPS,S,favs}))}catch(e){}}
+
+const $=s=>document.querySelector(s);
+const view=$("#view");
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const catT=id=>TYPES.find(t=>t.id===id).t;
+
+// dates
+const today=new Date(); today.setHours(0,0,0,0);
+const DAYS=Array.from({length:42},(_,i)=>{const d=new Date(today);d.setDate(d.getDate()+i);return d});
+const fmt=(d,o)=>d.toLocaleDateString("fr-FR",o);
+const dayName=i=>i===0?"Aujourd'hui":i===1?"Demain":fmt(DAYS[i],{weekday:"long",day:"numeric",month:"long"});
+const iso=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+const runsOf=e=>e.runs||(e.run?[e.run]:[]);
+const runOn=(e,d)=>{const s=iso(d);return runsOf(e).find(r=>s>=r.from&&s<=r.to&&r.days.includes(d.getDay()))};
+const playsOn=(e,d)=>e.dates?e.dates.includes(iso(d)):!!runOn(e,d);
+const timeOn=(e,d)=>{if(e.times)return e.times[iso(d)]||Object.values(e.times)[0];if(e.dates)return e.time;const r=runOn(e,d)||runsOf(e)[0];return (r.alt&&r.alt[d.getDay()])||r.time};
+const priceTxt=e=>e.price===0?"gratuit":e.price==null?"prix à vérifier":"dès "+e.price.toLocaleString("fr-FR",{maximumFractionDigits:2})+" €";
+const WEST=["saint-cloud","boulogne-billancourt","sèvres","suresnes","rueil-malmaison","garches","versailles","nanterre","meudon","issy-les-moulineaux","neuilly-sur-seine","puteaux","courbevoie","marnes-la-coquette","vaucresson","le chesnay"];
+const near=(a,b)=>{a=a.trim().toLowerCase();b=b.toLowerCase();if(!a)return 0;if(a===b)return 2;if(WEST.includes(a)&&(WEST.includes(b)||b==="paris"))return 1;if(a==="paris"&&WEST.includes(b))return 1;return 0};
+const NEW=new Set(EVENTS.filter(e=>{const r=runsOf(e)[0];if(!r)return false;const f=new Date(r.from),diff=(f-today)/864e5;return diff>-16&&diff<21}).map(e=>e.id));
+
+// moteur de recommandation, par occasion (amoureux, famille…)
+function score(e,occ,d){
+  let s=0, why=[];
+  if(S.types.includes(e.cat)){s+=38;why.push("vous aimez "+catT(e.cat).toLowerCase())}
+  const fa=followedOf(e.artists); if(fa){s+=26;why.unshift("vous suivez "+fa)}
+  if(occ){ if(e.aud.includes(occ))s+=18; else if(occ==="famille"&&S.ages.includes(YA)&&(e.aud.includes("amis")||e.aud.includes("solo")))s+=12; else return null; }
+  else if(S.who.some(w=>e.aud.includes(w)))s+=14;
+  const fam=occ?occ==="famille":(S.who.length===1&&S.who[0]==="famille");
+  if(fam){ if(ageOk(e)){s+=14;why.push(e.ages?"adapté à l'âge des enfants":"idéal avec vos grands enfants")} else return null; }
+  const bst=(S.boost&&S.boost[e.cat])||0; s+=bst; if(bst>=6&&why.length<2)why.push("vous aimez ce genre en ce moment");
+  if(S.duels.mood===e.mood){s+=8;why.push(e.mood==="rire"?"on va rire":"des frissons garantis")}
+  if(S.duels.size===e.size)s+=5;
+  if(S.duels.style===e.style){s+=5;if(e.style==="decouverte"&&why.length<2)why.push("une vraie découverte")}
+  const cap={eco:25,mid:60,plus:999}[S.budget]||999;
+  s+= (e.price==null||e.price<=cap)?8:-12;
+  const nr=near(S.city,e.city);
+  if(nr===2){s+=10;why.unshift("tout près de chez vous")}else if(nr===1)s+=5;
+  if(d){const we=WE.includes(d.getDay()), soir=parseInt(timeOn(e,d))>=18;
+    if((!we&&soir&&S.moments.includes("semaine"))||(we&&!soir&&S.moments.includes("we_jour"))||(we&&soir&&S.moments.includes("we_soir")))s+=6;}
+  return {pct:Math.max(15,Math.min(99,Math.round(s))),why:why.slice(0,2)};
+}
+function picksFor(d,occ,n=4){
+  return EVENTS.filter(e=>playsOn(e,d)).map(e=>{const r=score(e,occ,d);return r&&{...e,...r,hr:timeOn(e,d)}}).filter(Boolean)
+    .sort((a,b)=>b.pct-a.pct).slice(0,n);
+}
+function bestOfDay(d){
+  const all=S.who.flatMap(o=>picksFor(d,o,3));
+  const uniq=[...new Map(all.sort((a,b)=>b.pct-a.pct).map(e=>[e.id,e])).values()];
+  return uniq;
+}
+
+/* ---------- ONBOARDING ---------- */
+function tile(o,on,attr){return `<button class="tile" ${attr}="${o.id}" aria-pressed="${on}"><span class="glyph">${esc(o.g)}</span><b>${esc(o.t)}</b><small>${esc(o.s)}</small></button>`}
+function nav(ok,label="Suivant"){
+  const back = editing?`<button class="btn ghost" id="cancel">Annuler</button>`:(onboard>0?`<button class="btn ghost" id="back">← Retour</button>`:"<span></span>");
+  return `<div class="actions">${back}<button class="btn primary" id="next" ${ok?"":"disabled"}>${editing?"Enregistrer":label}</button></div>`;
+}
+function onboardingView(){
+  const i=onboard;
+  if(i===0)return `<section class="ticket notch step"><div class="eyebrow">Accueil · on fait connaissance</div>
+    <h1>Votre prochaine sortie commence ici.</h1>
+    <p class="lead">Six petits billets à remplir, et on vous sort un programme pour chaque jour : spectacles, concerts, salons, à deux ou avec les enfants.</p>
+    <div class="tear"></div><div class="stack">
+    <div><label class="f" for="name">Votre prénom</label><input type="text" id="name" placeholder="Ex. Laure" value="${esc(S.name)}" autocomplete="given-name"></div>
+    <div><label class="f" for="city">Où habitez-vous ?</label><input type="text" id="city" list="cities" placeholder="Ville ou code postal" value="${esc(S.city)}">
+    <datalist id="cities"><option>Paris</option><option>Saint-Cloud</option><option>Boulogne-Billancourt</option><option>Versailles</option><option>Nanterre</option><option>Rueil-Malmaison</option><option>Sèvres</option><option>Suresnes</option><option>Vincennes</option><option>Montreuil</option></datalist></div>
+    </div>${nav(S.name&&S.city,"C'est parti")}</section>`;
+  if(i===1)return `<section class="ticket notch step"><div class="eyebrow">Billet 2 · vos goûts</div>
+    <h2>${esc(S.name||"Vous")}, qu'est-ce qui vous fait vibrer ?</h2><p class="lead">Choisissez-en autant que vous voulez.</p><div class="tear"></div>
+    <div class="grid">${TYPES.map(o=>tile(o,S.types.includes(o.id),"data-type")).join("")}</div>
+    <p class="hint">${S.types.length?S.types.length+" sélectionné"+(S.types.length>1?"s":""):"Au moins un choix pour continuer"}</p>${nav(S.types.length)}</section>`;
+  if(i===2)return `<section class="ticket notch step"><div class="eyebrow">Billet 3 · vos artistes</div>
+    <h2>Qui aimeriez-vous voir sur scène ?</h2><p class="lead">On vous prévient dès que leurs places sont mises en vente. Facultatif, vous pourrez compléter plus tard.</p><div class="tear"></div>
+    <div class="stack">${artistPicker()}</div>
+    <p class="hint">${S.artists.length?S.artists.length+" artiste"+(S.artists.length>1?"s":"")+" suivi"+(S.artists.length>1?"s":""):"Aucun artiste choisi"}</p>${nav(true,S.artists.length?"Suivant":"Passer")}</section>`;
+  if(i===3)return `<section class="ticket notch step"><div class="eyebrow">Billet 4 · la troupe</div>
+    <h2>Vous sortez avec qui ?</h2><p class="lead">Plusieurs réponses possibles : on vous fera des suggestions pour chaque occasion.</p><div class="tear"></div>
+    <div class="grid">${WHO.map(o=>tile(o,S.who.includes(o.id),"data-who")).join("")}</div>
+    ${S.who.includes("famille")?`<p class="hint" style="margin-top:16px">Âge des enfants (plusieurs choix possibles)</p><div class="chips" style="margin-top:8px">${AGES.map(a=>`<button class="chipbtn" data-age="${a}" aria-pressed="${S.ages.includes(a)}">${a}</button>`).join("")}</div>`:""}
+    ${nav(S.who.length&&(!S.who.includes("famille")||S.ages.length))}</section>`;
+  if(i===4)return `<section class="ticket notch step"><div class="eyebrow">Billet 5 · l'ambiance</div>
+    <h2>Plutôt ceci, ou plutôt cela ?</h2><p class="lead">Trois duels express, suivez votre instinct.</p><div class="tear"></div>
+    <div class="duels">${DUELS.map(d=>`<div class="duel">
+      <button class="tile" data-duel="${d.id}" data-v="${d.a[0]}" aria-pressed="${S.duels[d.id]===d.a[0]}"><b>${d.a[1]}</b></button><span class="vs">ou</span>
+      <button class="tile" data-duel="${d.id}" data-v="${d.b[0]}" aria-pressed="${S.duels[d.id]===d.b[0]}"><b>${d.b[1]}</b></button></div>`).join("")}</div>
+    ${nav(Object.keys(S.duels).length===DUELS.length)}</section>`;
+  return `<section class="ticket notch step"><div class="eyebrow">Billet 6 · le pratique</div>
+    <h2>Vos moments de sortie, et votre budget</h2><div class="tear"></div>
+    <div class="stack"><div><label class="f">Quand sortez-vous d'habitude ?</label><div class="chips">${MOMENTS.map(m=>`<button class="chipbtn" data-mom="${m[0]}" aria-pressed="${S.moments.includes(m[0])}">${m[1]}</button>`).join("")}</div>
+    <p class="hint">On vous propose quand même quelque chose chaque jour.</p></div>
+    <div><label class="f">Budget par personne</label><div class="chips">${BUDGET.map(b=>`<button class="chipbtn" data-budget="${b[0]}" aria-pressed="${S.budget===b[0]}">${b[1]}</button>`).join("")}</div></div></div>
+    ${nav(S.budget,"Voir mon programme")}</section>`;
+}
+
+/* ---------- PAGES ---------- */
+function card(e,showDate){
+  const fav=favs.includes(e.id);
+  return `<button class="ev" data-open="${e.id}">
+    <div class="side">${e.pct!=null?`<span class="pct">${e.pct}%</span><small>match</small>`:""}${e.hr?`<span class="hr">${e.approx?"≈":""}${e.hr.replace(":","h")}</span>`:""}</div>
+    <div class="main"><span class="cat">${catT(e.cat)}${showDate?" · "+showDate:""}</span>
+      <h3>${esc(e.t)}${fav?' <span class="heart" aria-label="favori">♥</span>':""}</h3>
+      <span class="meta">${esc(e.venue)} · ${esc(e.city)} · <span class="price">${priceTxt(e)}</span></span>
+      ${e.why&&e.why.length?`<span class="why"><b>Pourquoi ?</b> ${e.why.join(", ")}.</span>`:""}
+    </div></button>`;
+}
+function dayStrip(){
+  return `<div class="days" role="group" aria-label="Choisir un jour">${DAYS.slice(0,14).map((d,i)=>`<button class="day" data-day="${i}" aria-pressed="${i===dayIdx}">
+    <small>${i===0?"Auj.":fmt(d,{weekday:"short"}).replace(".","")}</small><b>${d.getDate()}</b><i>${fmt(d,{month:"short"}).replace(".","")}</i></button>`).join("")}</div>`;
+}
+const nextIdx=e=>DAYS.findIndex(d=>playsOn(e,d));
+const short=i=>i===0?"Aujourd'hui":i===1?"Demain":fmt(DAYS[i],{weekday:"short",day:"numeric",month:"short"});
+function anyScore(e){const rs=S.who.map(o=>score(e,o,null)).filter(Boolean);return rs.sort((a,b)=>b.pct-a.pct)[0]||null}
+function hcard(e){
+  return `<button class="hcard" data-open="${e.id}"><span class="badge">${NEW.has(e.id)?"Nouveau":catT(e.cat)}</span>
+    <span class="hpct">${e.pct}%</span><strong>${esc(e.t)}</strong><span>${catT(e.cat)} · ${esc(e.city)}</span><span class="when">${short(nextIdx(e))} · ${priceTxt(e)}</span></button>`;
+}
+function pageHome(){
+  const hr=new Date().getHours(), hello=hr<18?"Bonjour":"Bonsoir";
+  const tonight=bestOfDay(DAYS[0])[0];
+  const news=EVENTS.filter(e=>NEW.has(e.id)).map(e=>{const r=anyScore(e);return r&&{...e,...r}}).filter(Boolean).sort((a,b)=>b.pct-a.pct).slice(0,6);
+  const cats=S.types.slice(0,3).map(c=>{
+    const list=EVENTS.filter(e=>e.cat===c).map(e=>{const r=anyScore(e);return r&&{...e,...r,ni:nextIdx(e)}}).filter(e=>e&&e.ni>=0).sort((a,b)=>a.ni-b.ni).slice(0,3);
+    return list.length?`<section class="section"><div class="sec-title"><span>${PLUR[c]}</span><button class="link" data-wkcat="${c}">Voir tout</button></div>
+      <div class="rows">${list.map(e=>`<button class="rowev" data-open="${e.id}"><span class="rd">${short(e.ni)}<b>${timeOn(e,DAYS[e.ni]).replace(":","h")}</b></span><span class="rt"><strong>${esc(e.t)}</strong><span>${esc(e.venue)} · ${esc(e.city)}</span></span><span class="rp">${e.pct}%</span></button>`).join("")}</div></section>`:"";
+  }).join("");
+  const we=weekends()[0]; const wecount=we.flatMap(i=>EVENTS.filter(e=>playsOn(e,DAYS[i]))).length;
+  return `<div class="stack step">
+    <div class="greet"><p>${hello} ${esc(S.name)}</p><h1>À l'affiche pour vous</h1></div>
+    ${askBox()}
+    ${tonight?`<button class="feature" data-open="${tonight.id}"><span class="eyebrow">${hr<18?"Aujourd'hui":"Ce soir"} · ${tonight.hr.replace(":","h")}</span><strong>${esc(tonight.t)}</strong><span>${esc(tonight.venue)} · ${tonight.why.join(", ")||catT(tonight.cat)}</span><span class="fpct">${tonight.pct}% match</span></button>`:""}
+    ${homeAlerts()}
+    ${news.length?`<section class="section"><div class="sec-title"><span>Nouvelles sorties pour vous</span><small>${news.length}</small></div><div class="carousel">${news.map(hcard).join("")}</div></section>`:""}
+    ${collection("Opéra de Paris","Opéra de Paris","Opéras et ballets à Garnier et Bastille cet automne.",SRC.opsite)}
+    ${collection("Expositions","Les expos du moment","De Monet à l'intelligence artificielle, à Paris et autour.",null)}
+    ${collection("Candlelight","Concerts Candlelight","Pop, films et classique à la lueur des bougies.",null)}
+    ${cats}
+    <button class="weteaser" data-tab="weekend"><span><small>Ce week-end</small><strong>${wecount} sorties possibles près de chez vous</strong></span><span class="arrow">→</span></button>
+    <button class="btn outline" data-tab="agenda">Voir l'agenda jour par jour</button>
+    <p class="sample">Programmation réelle relevée le 20 octobre 2026. Vérifiez dates et horaires auprès de la salle avant de réserver.</p></div>`;
+}
+function weekends(){
+  const g=[];let cur=null;
+  DAYS.forEach((d,i)=>{const w=d.getDay();if(w===6||(w===0&&!cur)){cur=[i];g.push(cur)}else if(w===0&&cur){cur.push(i);cur=null}else if(w!==0&&w!==6)cur=null});
+  return g;
+}
+/* ---------- AVIS DES TESTEURS (db partagée) ---------- */
+let DB=null, USER=null, ME=null, OWNER=false, capsReady=false;
+const STANDALONE=!(window.claude&&window.claude.use)&&/^https?:$/.test(location.protocol||"");
+let avForm={note:0,aime:"",manque:"",usage:"",prenom:""}, avState="", avFrom="accueil", avList=null, avErr="";
+(async()=>{
+  try{
+    if(!window.claude||!window.claude.use){capsReady=true;return}
+    const [u,d]=await Promise.all([claude.use("user"),claude.use("db")]);
+    USER=u; DB=d;
+    if(USER){OWNER=await USER.isOwner();try{ME=await USER.id()}catch(e){ME=null}}
+  }catch(e){}
+  capsReady=true; if(page==="avis"||page==="avisrecus"||page==="profil")render();
+})();
+const USAGES=[["semaine","Oui, chaque semaine"],["mois","De temps en temps"],["non","Probablement pas"]];
+function pageAvis(){
+  if(avState==="ok")return `<div class="stack step"><div class="ticket notch"><div class="eyebrow">Merci</div><h1>Avis bien reçu.</h1>
+    <p class="lead">Il servira à améliorer Entracte. Vous pouvez en envoyer un autre plus tard, après avoir testé d'autres pages.</p>
+    <div class="actions"><span></span><button class="btn primary" data-tab="${avFrom}">Retour à l'appli</button></div></div></div>`;
+  const canSend=(DB&&ME)||STANDALONE;
+  const text=`Note : ${avForm.note}/5\nJ'ai aimé : ${avForm.aime}\nÀ améliorer : ${avForm.manque}\nUsage : ${(USAGES.find(u=>u[0]===avForm.usage)||["",""])[1]}`;
+  return `<div class="stack step"><div class="greet"><p>Prototype en test</p><h1>Donnez votre avis</h1></div>
+    <form class="ticket avform" id="avform">
+      <div class="field"><label class="f">Votre note globale</label>
+        <div class="stars" role="radiogroup" aria-label="Note sur 5">${[1,2,3,4,5].map(n=>`<button type="button" class="star" role="radio" aria-checked="${avForm.note===n}" aria-label="${n} sur 5" data-star="${n}">${n<=avForm.note?"★":"☆"}</button>`).join("")}</div></div>
+      <div class="field"><label class="f" for="av-aime">Ce que vous avez aimé</label><textarea id="av-aime" rows="3" placeholder="Le quiz, le swipe, les alertes…">${esc(avForm.aime)}</textarea></div>
+      <div class="field"><label class="f" for="av-manque">Ce qui manque ou vous a gêné</label><textarea id="av-manque" rows="3" placeholder="Une fonction, un bug, une page pas claire…">${esc(avForm.manque)}</textarea></div>
+      <div class="field"><label class="f">L'utiliseriez-vous pour choisir vos sorties ?</label><div class="chips">${USAGES.map(u=>`<button type="button" class="chipbtn" data-usage="${u[0]}" aria-pressed="${avForm.usage===u[0]}">${u[1]}</button>`).join("")}</div></div>
+      <div class="field"><label class="f" for="av-prenom">Votre prénom <span class="opt">(facultatif)</span></label><input type="text" id="av-prenom" value="${esc(avForm.prenom)}" autocomplete="given-name"></div>
+      ${avErr?`<p class="averr">${esc(avErr)}</p>`:""}
+      ${!capsReady?`<p class="hint">Connexion en cours…</p>`:canSend?`<div class="actions"><button type="button" class="btn ghost" data-tab="${avFrom}">Annuler</button><button class="btn primary" id="avsend" type="submit" ${avForm.note&&avState!=="sending"?"":"disabled"}>${avState==="sending"?"Envoi…":"Envoyer mon avis"}</button></div>
+        ${avForm.note?"":`<p class="hint">Choisissez une note pour envoyer.</p>`}`
+      :`<div class="avfallback"><p>L'envoi direct demande d'être connecté à Claude. Copiez votre avis et envoyez-le à la personne qui vous a partagé l'appli.</p><textarea id="av-copy" rows="5" readonly>${esc(text)}</textarea><button type="button" class="btn outline" id="avcopy">Copier mon avis</button></div>`}
+    </form></div>`;
+}
+async function sendAvis(){
+  if(!avForm.note||avState==="sending")return;
+  const entry={note:avForm.note,aime:avForm.aime.slice(0,2000),manque:avForm.manque.slice(0,2000),usage:avForm.usage,prenom:avForm.prenom.slice(0,60),page:avFrom,at:new Date().toISOString()};
+  if(STANDALONE){
+    avState="sending";avErr="";render();
+    try{const r=await fetch("/",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:new URLSearchParams({"form-name":"avis",note:String(entry.note),aime:entry.aime,manque:entry.manque,usage:(USAGES.find(u=>u[0]===entry.usage)||["",""])[1],prenom:entry.prenom,page:entry.page}).toString()});
+      if(!r.ok)throw new Error(r.status);avState="ok";avForm={note:0,aime:"",manque:"",usage:"",prenom:avForm.prenom}}
+    catch(e){avState="";avErr="L'envoi n'a pas abouti. Vérifiez votre connexion et réessayez."}
+    render();return;
+  }
+  if(!DB||!ME)return;
+  avState="sending";avErr="";render();
+  try{
+    const ref=DB.doc("avis/"+ME); const snap=await ref.get();
+    const prev=snap.exists?(snap.data().entries||[]):[];
+    await ref.set({entries:[...prev,entry].slice(-20),last:entry.at,n:prev.length+1});
+    avState="ok";avForm={note:0,aime:"",manque:"",usage:"",prenom:avForm.prenom};
+  }catch(e){avState="";avErr=e&&e.code==="permission_denied"?"Votre accès ne permet pas d'envoyer d'avis. Demandez à la personne qui vous a partagé l'appli.":"L'envoi n'a pas abouti. Vérifiez votre connexion et réessayez."}
+  render();
+}
+async function loadAvis(){
+  if(!DB||!OWNER)return;
+  try{const q=await DB.collection("avis").orderBy("last","desc").limit(500).get();avList=q.docs.flatMap(d=>((d.data()||{}).entries||[]).map(x=>({...x,who:d.id}))).sort((a,b)=>b.at.localeCompare(a.at))}
+  catch(e){avList=[];avErr="Impossible de charger les avis pour l'instant."}
+  if(page==="avisrecus")render();
+}
+function pageAvisRecus(){
+  if(!OWNER)return `<div class="stack step"><p class="empty">Cette page est réservée à la créatrice de l'appli.</p></div>`;
+  if(avList===null){loadAvis();return `<div class="stack step"><div class="greet"><p>Retours des testeurs</p><h1>Avis reçus</h1></div><p class="empty">Chargement des avis…</p></div>`}
+  const n=avList.length, moy=n?(avList.reduce((s,a)=>s+a.note,0)/n):0, testeurs=new Set(avList.map(a=>a.who)).size;
+  const cnt=k=>avList.filter(a=>a.usage===k).length;
+  return `<div class="stack step"><div class="greet"><p>Retours des testeurs</p><h1>Avis reçus</h1></div>
+    ${n?`<div class="facts"><div class="fact"><small>Avis</small><b>${n}</b></div><div class="fact"><small>Testeurs</small><b>${testeurs}</b></div><div class="fact"><small>Note moyenne</small><b>${moy.toLocaleString("fr-FR",{maximumFractionDigits:1})} / 5</b></div></div>
+    <div class="usagebar">${USAGES.map(u=>`<div><small>${u[1]}</small><b>${cnt(u[0])}</b></div>`).join("")}</div>
+    <div class="avlist">${avList.map(a=>`<article class="avitem"><div class="avhead"><span class="avstars" aria-label="${a.note} sur 5">${"★".repeat(a.note)}${"☆".repeat(5-a.note)}</span><span>${esc(a.prenom||"Anonyme")} · ${new Date(a.at).toLocaleDateString("fr-FR",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})}</span></div>
+      ${a.aime?`<p><b>Aimé :</b> ${esc(a.aime)}</p>`:""}${a.manque?`<p><b>À améliorer :</b> ${esc(a.manque)}</p>`:""}
+      <span class="meta">${(USAGES.find(u=>u[0]===a.usage)||["","Usage non précisé"])[1]} · envoyé depuis la page ${esc(a.page)}</span></article>`).join("")}</div>`
+    :`<p class="empty">Aucun avis pour l'instant. Partagez l'appli à vos testeurs : le bouton « Avis » est en haut de chaque page.</p>`}
+    <button class="btn outline" id="avreload">Actualiser</button></div>`;
+}
+
+/* ---------- ARTISTES & BILLETTERIE ---------- */
+const nA=s=>s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^a-z0-9]+/g," ").trim();
+const follows=a=>S.artists.some(x=>nA(x)===nA(a));
+const followedOf=list=>(list||[]).find(a=>S.artists.some(x=>{const p=nA(x),q=nA(a);return p===q||(p.length>3&&q.includes(p))}));
+const daysTo=s=>Math.round((new Date(s+"T00:00:00")-today)/864e5);
+const inTxt=n=>n<=0?"aujourd'hui":n===1?"demain":"dans "+n+" jours";
+let tkFilter="mine", artOpen=false, artDirty=false;
+const artSummary=()=>S.artists.length?S.artists.slice(0,4).join(", ")+(S.artists.length>4?" et "+(S.artists.length-4)+" autres":""):"Aucun artiste suivi pour l'instant";
+function artistPicker(){
+  const all=ARTGROUPS.flatMap(g=>g[1]);
+  const custom=S.artists.filter(a=>!all.some(x=>nA(x)===nA(a)));
+  return `${ARTGROUPS.map(g=>`<div class="agroup"><small>${g[0]}</small><div class="chips">${g[1].map(a=>`<button class="chipbtn" data-art="${esc(a)}" aria-pressed="${follows(a)}">${esc(a)}</button>`).join("")}</div></div>`).join("")}
+    <div class="agroup"><small>Un autre artiste</small><div class="addart"><input type="text" id="artin" placeholder="Nom de l'artiste" autocomplete="off"><button class="btn outline" id="artadd" type="button">Suivre</button></div>
+    ${custom.length?`<div class="chips">${custom.map(a=>`<button class="chipbtn" data-art="${esc(a)}" aria-pressed="true">${esc(a)} ✕</button>`).join("")}</div>`:""}</div>`;
+}
+function tkcard(o){
+  const mine=follows(o.a), on=S.alerts.includes(o.k);
+  let left="";
+  if(o.st==="soon"){const d=new Date(o.open+"T00:00:00");left=`<small>Ouverture</small><b>${d.getDate()}</b><i>${fmt(d,{month:"short"}).replace(".","")}</i>`}
+  else if(o.st==="tba")left=`<span class="pill">Annoncé</span>`;
+  else left=`<span class="pill ok">${o.st==="partial"?"Dernières places":"En vente"}</span>`;
+  const sub=o.st==="soon"?`<span class="cd">${o.pre?"Prévente ":"Mise en vente "}${inTxt(daysTo(o.open))}${o.hour?" à "+o.hour.replace(":","h"):" · heure à vérifier"}</span>`
+    :o.st==="tba"?`<span class="cd q">Date de mise en vente à vérifier</span>`:"";
+  return `<article class="tk${mine?" mine":""}">
+    <div class="tkdate">${left}</div>
+    <div class="tkmain"><strong>${esc(o.a)}${mine?' <span class="following">suivi</span>':""}</strong><span>${esc(o.show)}</span><span class="meta">${esc(o.venue)} · ${esc(o.when)}${o.price?" · "+esc(o.price):""}</span>${o.note?`<span class="meta">${esc(o.note)}</span>`:""}${sub}</div>
+    <div class="tkact">${o.st==="open"||o.st==="partial"?`<a class="mini hot" href="${o.src}" target="_blank" rel="noopener">Voir les places ↗</a>`:`<button class="mini${on?" on":""}" data-alert="${o.k}" aria-pressed="${on}">${on?"✓ Alerte activée":"M'alerter"}</button>`}</div>
+  </article>`;
+}
+function pageTickets(){
+  const keep=o=>tkFilter==="all"||follows(o.a)||S.alerts.includes(o.k);
+  const L=ONSALE.filter(keep);
+  const soon=L.filter(o=>o.st==="soon").sort((a,b)=>a.open.localeCompare(b.open));
+  const open=L.filter(o=>o.st==="open"||o.st==="partial"), tba=L.filter(o=>o.st==="tba");
+  const live=EVENTS.filter(e=>followedOf(e.artists)&&nextIdx(e)>=0).map(e=>({...e,...(score(e,null)||{pct:60,why:[]}),di:nextIdx(e),hr:timeOn(e,DAYS[nextIdx(e)])})).sort((a,b)=>a.di-b.di);
+  const sec=(t,arr)=>arr.length?`<section class="section"><div class="sec-title"><span>${t}</span><small>${arr.length}</small></div><div class="tks">${arr.map(tkcard).join("")}</div></section>`:"";
+  const none=!soon.length&&!open.length&&!tba.length;
+  return `<div class="stack step"><div class="greet"><p>Billetterie</p><h1>Ne ratez plus une mise en vente</h1></div>
+    <details class="artbox" id="artbox" ${artOpen||!S.artists.length?"open":""}><summary><span><small>Vos artistes · <b id="artn">${S.artists.length}</b> suivis</small><strong id="artsum">${esc(artSummary())}</strong></span><span class="link">${artOpen?"Fermer":"Modifier"}</span></summary>
+      <p class="hint" style="margin:0 0 6px">Touchez autant d'artistes que vous voulez, puis validez.</p>${artistPicker()}
+      <button class="btn primary artok" id="artok" type="button">Valider ma sélection</button></details>
+    <div class="seg" role="group" aria-label="Filtrer"><button data-tk="mine" aria-pressed="${tkFilter==="mine"}">Mes artistes et alertes</button><button data-tk="all" aria-pressed="${tkFilter==="all"}">Toutes les annonces</button></div>
+    ${live.length?`<section class="section"><div class="sec-title"><span>Vos artistes en concert bientôt</span><small>${live.length}</small></div><div class="cards">${live.slice(0,6).map(e=>card(e,short(e.di))).join("")}</div></section>`:""}
+    ${sec("Bientôt en vente",soon)}${sec("Déjà en vente",open)}${sec("Annoncés",tba)}
+    ${none?`<p class="empty">Aucune annonce pour vos artistes pour l'instant. Suivez d'autres artistes ou passez sur « Toutes les annonces ».</p>`:""}
+    <p class="sample">Dans l'appli finale, une notification arrivera la veille et à l'ouverture des ventes. Ici, les alertes restent sur cet appareil. Sources : <a href="${SRC.onsale}" target="_blank" rel="noopener">concerts.paris</a>, <a href="${SRC.tours}" target="_blank" rel="noopener">Agenda culturel</a>.</p></div>`;
+}
+function homeAlerts(){
+  const hot=ONSALE.filter(o=>o.st==="soon"&&(follows(o.a)||S.alerts.includes(o.k))&&daysTo(o.open)<=7).sort((a,b)=>a.open.localeCompare(b.open));
+  if(!hot.length)return "";
+  const o=hot[0];
+  return `<button class="alertbar" data-tab="billets"><span class="bell" aria-hidden="true">●</span><span><small>Mise en vente ${inTxt(daysTo(o.open))}</small><strong>${esc(o.a)} · ${esc(o.venue)}</strong>${hot.length>1?`<em>et ${hot.length-1} autre${hot.length>2?"s":""} ouverture${hot.length>2?"s":""} cette semaine</em>`:""}</span><span class="arrow">→</span></button>`;
+}
+function collection(serie,title,sub,link){
+  const list=EVENTS.filter(e=>e.serie===serie).map(e=>{const ni=nextIdx(e);if(ni<0)return null;return {...e,...(score(e,null)||{pct:50,why:[]}),ni}}).filter(Boolean).sort((a,b)=>a.ni-b.ni);
+  if(!list.length)return "";
+  return `<section class="section coll"><div class="sec-title"><span>${title}</span>${link?`<a class="link" href="${link}" target="_blank" rel="noopener">Site officiel ↗</a>`:""}</div><p class="collsub">${sub}</p>
+    <div class="carousel">${list.slice(0,8).map(e=>`<button class="hcard" data-open="${e.id}"><span class="badge alt">${esc(serie)}</span><span class="hpct">${e.pct}%</span><strong>${esc(e.t.replace("Candlelight · ",""))}</strong><span>${esc(e.venue)}</span><span class="when">${short(e.ni)} · ${timeOn(e,DAYS[e.ni]).replace(":","h")} · ${priceTxt(e)}</span></button>`).join("")}</div></section>`;
+}
+
+/* ---------- DÉCOUVRIR (SWIPE) ---------- */
+const POSTER={humour:["#FF4F1F","#FFB03B"],theatre:["#2B1F6E","#7A5CFF"],concert:["#06615C","#2CC9BE"],musical:["#B8285F","#FF8A5C"],danse:["#5E1449","#D63F7A"],cirque:["#C24A00","#F2B300"],opera:["#151E48","#4A5FD6"],jeune:["#1F7A33","#8FC23A"],salon:["#6E4318","#D99A4E"],festival:["#4A1694","#FF4FB3"],expo:["#1E3A5F","#5FA8D3"]};
+let seen=new Set(), swLikes=0, swToast="";
+function deck(){
+  return EVENTS.map(e=>{const ni=nextIdx(e);if(ni<0)return null;const r=anyScore(e)||score(e,null,null)||{pct:30,why:[]};return {...e,...r,ni,hr:timeOn(e,DAYS[ni])}})
+    .filter(e=>e&&!seen.has(e.id)).sort((a,b)=>b.pct-a.pct);
+}
+function scard(e,i){
+  const [c1,c2]=POSTER[e.cat];
+  return `<article class="scard${i===0?" top":""}" data-sid="${e.id}" style="--c1:${c1};--c2:${c2};--i:${i}" ${i===0?'tabindex="0" aria-label="'+esc(e.t)+'"':'aria-hidden="true"'}>
+    <span class="art" aria-hidden="true">${esc(TYPES.find(t=>t.id===e.cat).g)}</span>
+    <span class="stamp like">J'Y VAIS</span><span class="stamp nope">BOF</span>
+    <span class="scat">${catT(e.cat)}${NEW.has(e.id)?" · nouveau":""}</span>
+    <h2>${esc(e.t)}</h2>
+    <span class="smeta">${short(e.ni)} · ${e.approx?"≈":""}${e.hr.replace(":","h")} · ${esc(e.venue)}</span>
+    <span class="sfoot"><span class="spct">${e.pct}% match</span><span>${priceTxt(e)}</span></span>
+    ${e.why.length?`<span class="swhy">${e.why.join(" · ")}</span>`:""}
+  </article>`;
+}
+function pageSwipe(){
+  const d=deck().slice(0,3);
+  return `<div class="stack step"><div class="greet"><p>Découvrir</p><h1>Swipez vos envies</h1></div>
+    <div class="swipezone">${d.length?d.map((e,i)=>scard(e,i)).reverse().join(""):`<div class="swempty"><h3>Vous avez tout vu</h3><p>${swLikes} coup${swLikes>1?"s":""} de cœur ajouté${swLikes>1?"s":""} à vos favoris.</p><button class="btn primary" id="swreset">Revoir les cartes</button></div>`}</div>
+    ${d.length?`<div class="swbtns"><button class="swb nope" data-sw="nope" aria-label="Je passe">✕</button><button class="swb info" data-sw="info" aria-label="Voir la fiche">i</button><button class="swb like" data-sw="like" aria-label="J'y vais">♥</button></div>
+    <p class="swhint">Glissez à droite pour garder, à gauche pour passer, vers le haut pour ouvrir la fiche. Chaque geste affine vos suggestions.</p>`:""}
+    <p class="note" aria-live="polite">${esc(swToast)}</p></div>`;
+}
+function swAct(kind){
+  const el=document.querySelector(".scard.top"); if(!el)return;
+  const id=+el.dataset.sid, e=EVENTS.find(x=>x.id===id);
+  if(kind==="info"){detailId=id;render();scrollTo({top:0});return}
+  S.boost=S.boost||{};
+  if(kind==="like"){if(!favs.includes(id))favs.push(id);swLikes++;S.boost[e.cat]=Math.min(12,(S.boost[e.cat]||0)+3);swToast="Ajouté aux favoris : "+e.t}
+  else {S.boost[e.cat]=Math.max(-6,(S.boost[e.cat]||0)-1);swToast=""}
+  seen.add(id);save();
+  const fly=()=>{render()};
+  if(matchMedia("(prefers-reduced-motion: reduce)").matches){fly();return}
+  el.style.transition="transform .3s ease, opacity .3s";el.style.transform=`translate(${kind==="like"?520:-520}px,40px) rotate(${kind==="like"?24:-24}deg)`;el.style.opacity="0";
+  setTimeout(fly,260);
+}
+function bindSwipe(){
+  const el=document.querySelector(".scard.top"); if(!el)return;
+  let x0=0,y0=0,dx=0,dy=0,drag=false;
+  const like=el.querySelector(".stamp.like"),nope=el.querySelector(".stamp.nope");
+  el.onpointerdown=ev=>{drag=true;x0=ev.clientX;y0=ev.clientY;el.setPointerCapture(ev.pointerId);el.style.transition="none"};
+  el.onpointermove=ev=>{if(!drag)return;dx=ev.clientX-x0;dy=ev.clientY-y0;el.style.transform=`translate(${dx}px,${dy}px) rotate(${dx/18}deg)`;like.style.opacity=Math.max(0,Math.min(1,dx/100));nope.style.opacity=Math.max(0,Math.min(1,-dx/100))};
+  el.onpointerup=el.onpointercancel=()=>{if(!drag)return;drag=false;
+    if(dx>100)swAct("like");else if(dx<-100)swAct("nope");else if(dy<-120)swAct("info");
+    else{el.style.transition="transform .25s";el.style.transform="";like.style.opacity=0;nope.style.opacity=0}
+    dx=dy=0};
+  el.onkeydown=ev=>{if(ev.key==="ArrowRight")swAct("like");if(ev.key==="ArrowLeft")swAct("nope");if(ev.key==="ArrowUp"||ev.key==="Enter")swAct("info")};
+}
+
+/* ---------- RECHERCHE EN LANGAGE NATUREL ---------- */
+const norm=s=>s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[’']/g," ");
+const CATKW=[["musical",/comedie musicale|\bmusical\b|\bmusicals\b/],["humour",/humour|humoriste|drole|rigoler|stand ?up|one man|marrer/],["concert",/concert|musique|chanteu|groupe|rock|pop|rap/],["theatre",/theatre|piece/],["danse",/danse|ballet|hip ?hop/],["cirque",/cirque|magie|magicien/],["opera",/opera|classique|orchestre/],["expo",/\bexpos?\b|exposition|musee|peinture|photo|tableau/],["salon",/salon|foire|degustation/],["festival",/festival|lumiere/]];
+const WDN=["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"];
+function parseAsk(raw){
+  const t=norm(raw), p={who:null,ages:[],days:null,dayLabel:"",cat:null,max:null,ids:null,rest:""};
+  if(/\b(fils|fille|enfant|enfants|gamin|gamins|petit|petite|petits|bebe|famille|neveu|niece|ado|ados|kids|gosses)\b/.test(t))p.who="famille";
+  else if(/\b(amoureux|amoureuse|femme|mari|copine|copain|cheri|cherie|couple|deux|romantique|date)\b/.test(t))p.who="couple";
+  else if(/\b(amis|amies|potes|copains|copines|bande|collegues)\b/.test(t))p.who="amis";
+  else if(/\b(seul|seule|solo)\b/.test(t))p.who="solo";
+  const m=t.match(/\b(\d{1,2}) ?ans\b/);
+  if(m){const a=+m[1];p.ages=[a<=3?"0-3 ans":a<=6?"4-6 ans":a<=11?"7-11 ans":a<=17?"12-17 ans":YA];if(!p.who)p.who="famille"}
+  else if(/\b(bebe|tout petit|tout-petit)/.test(t))p.ages=["0-3 ans"];
+  else if(/\bado/.test(t))p.ages=["12-17 ans"];
+  else if(/jeune adulte|etudiant|majeur|grand fils|grande fille|grands enfants/.test(t)){p.ages=[YA];if(!p.who)p.who="famille"}
+  const W=weekends(), idx=f=>DAYS.map((d,i)=>i).filter(f);
+  const lbl=a=>a.length===1?dayName(a[0]):fmt(DAYS[a[0]],{day:"numeric",month:"short"})+" – "+fmt(DAYS[a[a.length-1]],{day:"numeric",month:"short"});
+  if(/ce soir|aujourd hui|maintenant/.test(t))p.days=[0];
+  else if(/apres.demain/.test(t))p.days=[2];
+  else if(/demain/.test(t))p.days=[1];
+  else if(/(week.?end|we) (prochain|suivant)|semaine prochaine.*week/.test(t))p.days=W[1];
+  else if(/week.?end|\bwe\b/.test(t))p.days=W[0];
+  else if(/semaine prochaine/.test(t))p.days=idx(i=>i>=7-((DAYS[0].getDay()+6)%7)&&i<14-((DAYS[0].getDay()+6)%7));
+  else if(/cette semaine/.test(t))p.days=idx(i=>i<7-((DAYS[0].getDay()+6)%7));
+  else if(/vacances|toussaint/.test(t))p.days=idx(i=>iso(DAYS[i])<="2026-11-01");
+  else if(/novembre/.test(t))p.days=idx(i=>DAYS[i].getMonth()===10);
+  else {const w=WDN.findIndex(n=>new RegExp("\\b"+n+"\\b").test(t));if(w>=0){const i=DAYS.findIndex(d=>d.getDay()===w);p.days=[i]}}
+  if(p.days)p.dayLabel=/week.?end|\bwe\b/.test(t)?(W.indexOf(p.days)===1?"le week-end prochain":"ce week-end")+" ("+lbl(p.days)+")":lbl(p.days);
+  if(/soir|soiree|nuit/.test(t))p.mom="soir"; else if(/matin|apres.midi|journee|gouter/.test(t))p.mom="jour";
+  for(const [c,re] of CATKW){if(re.test(t)){p.cat=c;break}}
+  if(/candlelight|bougie/.test(t))p.ids=EVENTS.filter(e=>e.serie==="Candlelight").map(e=>e.id);
+  else if(/opera de paris|garnier|bastille/.test(t))p.ids=EVENTS.filter(e=>e.serie==="Opéra de Paris").map(e=>e.id);
+  if(/gratuit/.test(t))p.max=0; else if(/pas cher|petit budget|petit prix|economique/.test(t))p.max=25;
+  const mm=t.match(/moins de (\d+)/); if(mm)p.max=+mm[1];
+  const STOP=new Set(["expo","expos","musee","salon","salons","theatre","festival","concert","musical","spectacle","comedy","club","paris","livre","presse","nuits","faire","pour","grand","petit","seul","tout","histoire","histoires","entre","deux","france","jeunesse","culturel","international","patrimoine","mere","prochain"]);
+  const hits=EVENTS.filter(e=>norm(e.t).split(/[^a-z0-9]+/).filter(w=>w.length>3&&!STOP.has(w)).some(w=>new RegExp("\\b"+w+"\\b").test(t)));
+  if(!p.ids&&hits.length&&hits.length<8)p.ids=hits.map(e=>e.id);
+  const venueHit=EVENTS.filter(e=>{const v=norm(e.venue+" "+e.city);return t.split(/\s+/).some(w=>w.length>4&&!["spectacle","sortie","cherche","recherche","faire","pour","weekend"].includes(w)&&v.includes(w))});
+  if(!p.ids&&!p.cat&&venueHit.length&&venueHit.length<EVENTS.length/2)p.ids=venueHit.map(e=>e.id);
+  return p;
+}
+function runAsk(p){
+  const days=p.days||DAYS.map((d,i)=>i);
+  const keepAges=S.ages; if(p.ages.length)S.ages=p.ages; else if(p.who==="famille"&&!S.ages.length)S.ages=AGES.slice();
+  const out=[];
+  for(const e of EVENTS){
+    if(p.ids&&!p.ids.includes(e.id))continue;
+    if(p.cat&&e.cat!==p.cat)continue;
+    if(p.max!=null&&(e.price==null||e.price>p.max))continue;
+    if(p.who==="famille"&&!e.aud.includes("famille")&&!((p.ages.length?p.ages:S.ages).includes(YA)&&(e.aud.includes("amis")||e.aud.includes("solo"))))continue;
+    const i=days.find(i=>playsOn(e,DAYS[i])&&(!p.mom||(p.mom==="soir"?parseInt(timeOn(e,DAYS[i]))>=18:parseInt(timeOn(e,DAYS[i]))<18))); if(i==null)continue;
+    const r=score(e,p.who,DAYS[i])||(p.ids||!p.who?score(e,null,DAYS[i])||{pct:40,why:[]}:null); if(!r)continue;
+    out.push({...e,...r,hr:timeOn(e,DAYS[i]),di:i});
+  }
+  S.ages=keepAges;
+  return out.sort((a,b)=>b.pct-a.pct).slice(0,20);
+}
+const ASK_EX=["Un spectacle pour mon fils de 8 ans ce week-end","Une sortie en amoureux samedi soir","Un concert la semaine prochaine","Un truc drôle et pas cher demain","Un salon gratuit en novembre","Que faire pendant les vacances avec les enfants ?"];
+function askBox(val=""){
+  return `<form class="ask" id="askform" role="search"><label for="ask">Dites-nous ce que vous cherchez</label>
+    <div class="askrow"><input type="search" id="ask" value="${esc(val)}" placeholder="${ASK_EX[0]}" autocomplete="off"><button class="btn primary" type="submit">Chercher</button></div>
+    <div class="sugg">${ASK_EX.slice(0,4).map(x=>`<button type="button" class="chipbtn" data-ask="${esc(x)}">${esc(x)}</button>`).join("")}</div></form>`;
+}
+let askQ="";
+function pageSearch(){
+  const p=parseAsk(askQ), res=runAsk(p);
+  const und=[p.who?WHO_LABEL[p.who]:null,p.ages.length?"enfant de "+p.ages[0]:null,p.dayLabel||null,p.mom==="soir"?"en soirée":p.mom==="jour"?"en journée":null,p.cat?catT(p.cat):null,p.max===0?"gratuit":p.max?"moins de "+p.max+" €":null,p.ids?"titre ou lieu reconnu":null].filter(Boolean);
+  return `<div class="stack step"><div class="greet"><p>Recherche</p><h1>${res.length} idée${res.length>1?"s":""} pour vous</h1></div>
+    ${askBox(askQ)}
+    <div class="understood"><small>On a compris</small><div class="chips">${und.length?und.map(u=>`<span class="tag">${esc(u)}</span>`).join(""):`<span class="tag">Tout le programme des 6 prochaines semaines</span>`}</div></div>
+    <div class="cards">${res.length?res.map(e=>card(e,short(e.di))).join(""):`<p class="empty">Rien ne correspond. Essayez une autre date ou retirez un critère, par exemple le budget.</p>`}</div></div>`;
+}
+
+function pageWeekend(){
+  const W=weekends(), wdays=W[wk]||W[0];
+  const label=d=>fmt(d,{weekday:"long",day:"numeric",month:"long"});
+  const days=wdays.filter(i=>wkDay==="both"||(wkDay==="sam"?DAYS[i].getDay()===6:DAYS[i].getDay()===0));
+  const occs=wkWho==="all"?S.who:[wkWho];
+  const groups=days.map(i=>{
+    const d=DAYS[i];
+    let list=EVENTS.filter(e=>playsOn(e,d)).map(e=>{const rs=occs.map(o=>{const r=score(e,o,d);return r&&{...r,occ:o}}).filter(Boolean).sort((a,b)=>b.pct-a.pct);return rs[0]&&{...e,...rs[0],hr:timeOn(e,d),occs:rs.map(r=>r.occ)}}).filter(Boolean);
+    list=list.filter(e=>(cat==="all"||e.cat===cat)&&(wkMom==="all"||(wkMom==="jour"?parseInt(e.hr)<18:parseInt(e.hr)>=18))&&(!q||(e.t+" "+e.venue+" "+e.city+" "+catT(e.cat)).toLowerCase().includes(q.toLowerCase())));
+    list.sort((a,b)=>b.pct-a.pct);
+    return `<section class="section"><div class="sec-title"><span style="text-transform:capitalize">${label(d)}</span><small>${list.length} sortie${list.length>1?"s":""}</small></div>
+      ${list.length?`<div class="cards">${list.map(e=>card(e)).join("")}</div>`:`<p class="empty">Rien avec ces filtres. Élargissez la recherche.</p>`}</section>`;
+  }).join("");
+  const wkLabel=i=>{const w=W[i];if(!w)return"";const a=DAYS[w[0]],b=DAYS[w[w.length-1]];return (i===0?"Ce week-end":i===1?"Le suivant":"Dans "+i+" sem.")+" · "+a.getDate()+(w.length>1?"-"+b.getDate():"")+" "+fmt(b,{month:"short"}).replace(".","")};
+  return `<div class="stack step"><div class="greet"><p>On fait quoi ?</p><h1>Mon week-end</h1></div>
+    <div class="seg" role="group" aria-label="Choisir le week-end">${W.slice(0,4).map((_,i)=>`<button data-wk="${i}" aria-pressed="${i===wk}">${wkLabel(i)}</button>`).join("")}</div>
+    <input type="search" id="q" placeholder="Un titre, une salle, une ville…" value="${esc(q)}" aria-label="Rechercher">
+    <div class="filterbox">
+      <div class="frow"><small>Jour</small><div class="chips">${[["both","Les deux"],["sam","Samedi"],["dim","Dimanche"]].map(x=>`<button class="chipbtn" data-wkday="${x[0]}" aria-pressed="${wkDay===x[0]}">${x[1]}</button>`).join("")}</div></div>
+      <div class="frow"><small>Moment</small><div class="chips">${[["all","Toute la journée"],["jour","En journée"],["soir","En soirée"]].map(x=>`<button class="chipbtn" data-wkmom="${x[0]}" aria-pressed="${wkMom===x[0]}">${x[1]}</button>`).join("")}</div></div>
+      ${S.who.length>1?`<div class="frow"><small>Avec qui</small><div class="chips"><button class="chipbtn" data-wkwho="all" aria-pressed="${wkWho==="all"}">Toutes</button>${S.who.map(o=>`<button class="chipbtn" data-wkwho="${o}" aria-pressed="${wkWho===o}">${WHO_LABEL[o]}</button>`).join("")}</div></div>`:""}
+      <div class="frow"><small>Envie</small><div class="chips scroll"><button class="chipbtn" data-cat="all" aria-pressed="${cat==="all"}">Tout</button>${TYPES.map(t=>`<button class="chipbtn" data-cat="${t.id}" aria-pressed="${cat===t.id}">${t.t}</button>`).join("")}</div></div>
+    </div>
+    ${groups}</div>`;
+}
+function pageAgenda(){
+  const d=DAYS[dayIdx];
+  const secs=S.who.map(o=>{
+    const list=picksFor(d,o);
+    return `<section class="section"><div class="sec-title"><span class="occ ${o}">${WHO_LABEL[o]}</span><small>${list.length} idée${list.length>1?"s":""}</small></div>
+    ${list.length?`<div class="cards">${list.map(e=>card(e)).join("")}</div>`:`<p class="empty">Rien qui vous ressemble ce jour-là. Essayez le jour suivant.</p>`}</section>`;
+  }).join("");
+  return `<div class="stack step">
+    <div class="greet"><p>Chaque jour, des idées</p><h1>${dayIdx===0?"Aujourd'hui":dayIdx===1?"Demain":fmt(d,{weekday:"long",day:"numeric",month:"long"})}</h1></div>
+    ${dayStrip()}${secs}
+    <p class="sample">Programmation réelle relevée le 20 octobre 2026. Vérifiez dates et horaires auprès de la salle avant de réserver.</p></div>`;
+}
+function pageFavs(){
+  const list=EVENTS.filter(e=>favs.includes(e.id)).map(e=>({...e,...(score(e,null)||{pct:null,why:[]})}));
+  return `<div class="stack step"><div class="greet"><p>Vos coups de cœur</p><h1>Favoris</h1></div>
+    ${list.length?`<div class="cards">${list.map(e=>card(e,"prochaine : "+(nextDates(e,1)[0]||"—"))).join("")}</div>`
+      :`<p class="empty">Aucun favori pour l'instant. Ouvrez un spectacle et touchez « Ajouter aux favoris ».</p>`}</div>`;
+}
+function pageProfile(){
+  const who=S.who.map(w=>WHO.find(x=>x.id===w).t).join(" + ")+(S.ages.length?" · enfants "+S.ages.join(", "):"");
+  const duel=DUELS.map(d=>(S.duels[d.id]===d.a[0]?d.a[1]:d.b[1])).join(" · ");
+  const rows=[
+    [0,"Identité",esc(S.name)+" · "+esc(S.city)],
+    [1,"Goûts",S.types.map(catT).join(", ")],
+    [2,"Artistes",S.artists.length?esc(S.artists.join(", ")):"Aucun artiste suivi"],
+    [3,"Avec qui",who],
+    [4,"Ambiance",duel],
+    [5,"Pratique",(S.moments.map(m=>MOMENTS.find(x=>x[0]===m)[1]).join(", ")||"Tous moments")+" · "+(BUDGET.find(b=>b[0]===S.budget)||["",""])[1]]
+  ];
+  return `<div class="stack step"><div class="greet"><p>Ce qui guide vos suggestions</p><h1>Profil</h1></div>
+    <div class="kv">${rows.map(r=>`<button data-edit="${r[0]}"><small>${r[1]}</small><span>${r[2]}</span><i>Modifier</i></button>`).join("")}</div>
+    <button class="btn primary" data-goavis="1">Donner mon avis sur l'appli</button>
+    ${OWNER?`<button class="btn outline" data-tab="avisrecus">Voir les avis des testeurs</button>`:""}
+    <button class="btn outline" id="restart">Refaire le quiz depuis le début</button>
+    <p class="sample">Prochainement : connexion aux billetteries partenaires et aux restaurants autour des salles.</p></div>`;
+}
+function nextDates(e,n=6){
+  const out=[];for(const d of DAYS){if(playsOn(e,d))out.push(fmt(d,{weekday:"short",day:"numeric",month:"short"})+" "+timeOn(e,d).replace(":","h"));if(out.length>=n)break}return out;
+}
+function pageDetail(){
+  const e=EVENTS.find(x=>x.id===detailId);const r=score(e,null)||{pct:null,why:[]};
+  const fav=favs.includes(e.id);
+  const forWho=S.who.filter(o=>score(e,o)).map(o=>`<span class="occ ${o}">${WHO_LABEL[o]}</span>`).join(" ");
+  return `<div class="stack step detail">
+    <button class="btn ghost backlink" id="dback">← Retour</button>
+    <div class="hero"><span class="cat">${catT(e.cat)}</span><h1>${esc(e.t)}</h1><p>${esc(e.venue)} · ${esc(e.city)}</p></div>
+    <div class="facts"><div class="fact"><small>Match</small><b>${r.pct!=null?r.pct+" %":"—"}</b></div><div class="fact"><small>Prix</small><b>${e.price==null?"À vérifier":e.price===0?"Gratuit":e.price.toLocaleString("fr-FR")+" €"}</b></div><div class="fact"><small>Âge</small><b>${e.ages?e.ages[0].split("-")[0]+" ans +":"Adultes"}</b></div></div>
+    ${forWho?`<div class="chips">${forWho}</div>`:""}
+    <p style="margin:0">${esc(e.d)}</p>
+    ${r.why.length?`<p class="why" style="margin:0"><b style="color:var(--accent)">Pourquoi pour vous ?</b> ${r.why.join(", ")}.</p>`:""}
+    ${e.approx?`<p class="note" style="text-align:left">Jours et horaires indicatifs, à vérifier auprès de la salle.</p>`:""}
+    <div><h3 class="sec-title" style="margin-bottom:8px">Prochaines dates</h3><div class="dates">${nextDates(e,8).map(x=>`<span>${x}</span>`).join("")}</div></div>
+    <div class="cta"><button class="btn primary" data-soon="billet">Réserver</button><button class="btn outline" data-soon="resto">Dîner à côté</button></div>
+    ${e.artists&&e.cat==="concert"?`<button class="btn outline" data-follow="${esc(e.artists[0])}">${follows(e.artists[0])?"✓ Vous suivez "+esc(e.artists[0]):"Suivre "+esc(e.artists[0])+" et être alerté de ses dates"}</button>`:""}
+    ${e.site?`<a class="btn outline srclink" href="${e.site}" target="_blank" rel="noopener">Réserver sur le site de l'Opéra de Paris ↗</a>`:""}
+    <a class="btn outline srclink" href="${e.src}" target="_blank" rel="noopener">Infos et horaires sur la source ↗</a>
+    <button class="btn outline" id="fav">${fav?"♥ Retirer des favoris":"♡ Ajouter aux favoris"}</button>
+    <p class="note" id="soon" aria-live="polite"></p></div>`;
+}
+
+const TABS=[
+ ["accueil","À l'affiche",'<path d="M4 4h16v16H4z"/><path d="M4 9h16M9 14h6"/>'],
+ ["decouvrir","Découvrir",'<rect x="6" y="3" width="12" height="17" rx="2.5"/><path d="M3 7v11M21 7v11"/>'],
+ ["weekend","Week-end",'<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>'],
+ ["billets","Billets",'<path d="M3 8a2 2 0 0 0 0 4v5h18v-5a2 2 0 0 0 0-4V5H3z"/><path d="M14 5v12" stroke-dasharray="2 2"/>'],
+ ["favoris","Favoris",'<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/>'],
+ ["profil","Profil",'<circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/>']
+];
+
+function render(){
+  const inApp=onboard>=STEPS&&!editing;
+  $("#perfs").hidden=inApp;
+  $("#perfs").innerHTML=Array.from({length:STEPS},(_,i)=>`<i class="${i<=onboard?"on":""}"></i>`).join("");
+  $("#tabs").hidden=!inApp; $("#hsearch").hidden=!inApp; $("#havis").hidden=!inApp;
+  $("#stubno").textContent=inApp?fmt(today,{weekday:"long",day:"numeric",month:"long"}):editing?"Modification":`Billet ${onboard+1} / ${STEPS}`;
+  if(!inApp){view.innerHTML=onboardingView();bind();return}
+  $("#tabsin").innerHTML=TABS.map(t=>`<button data-tab="${t[0]}" ${page===t[0]&&!detailId?'aria-current="page"':""}><svg viewBox="0 0 24 24" aria-hidden="true">${t[2]}</svg>${t[1]}</button>`).join("");
+  view.innerHTML=detailId?pageDetail():{accueil:pageHome,avis:pageAvis,avisrecus:pageAvisRecus,billets:pageTickets,decouvrir:pageSwipe,recherche:pageSearch,weekend:pageWeekend,agenda:pageAgenda,favoris:pageFavs,profil:pageProfile}[page]();
+  bind();
+}
+function go(p){page=p;detailId=null;try{history.replaceState(null,"","#"+p)}catch(e){}render();scrollTo({top:0})}
+
+function bind(){
+  const n=$("#next"),b=$("#back"),c=$("#cancel");
+  if(n)n.onclick=()=>{ if(editing){editing=false;onboard=STEPS;save();go("profil");return}
+    onboard++;save(); if(onboard>=STEPS){go("accueil");confetti()}else{render();scrollTo({top:0})} };
+  if(b)b.onclick=()=>{onboard--;render()};
+  if(c)c.onclick=()=>{Object.assign(S,JSON.parse(snapshot));editing=false;onboard=STEPS;go("profil")};
+  const nm=$("#name"),ct=$("#city");
+  if(nm){const chk=()=>{n.disabled=!(S.name&&S.city)};nm.oninput=e=>{S.name=e.target.value.trim();chk()};ct.oninput=e=>{S.city=e.target.value.trim();chk()}}
+  const A=(sel,fn)=>view.querySelectorAll(sel).forEach(el=>el.onclick=()=>fn(el));
+  const tog=(arr,v)=>arr.includes(v)?arr.filter(x=>x!==v):[...arr,v];
+  A("[data-type]",el=>{S.types=tog(S.types,el.dataset.type);render()});
+  A("[data-who]",el=>{S.who=tog(S.who,el.dataset.who);if(!S.who.includes("famille"))S.ages=[];else if(!S.types.includes("jeune"))S.types.push("jeune");render()});
+  A("[data-age]",el=>{S.ages=tog(S.ages,el.dataset.age);render()});
+  A("[data-duel]",el=>{S.duels[el.dataset.duel]=el.dataset.v;render()});
+  A("[data-mom]",el=>{S.moments=tog(S.moments,el.dataset.mom);render()});
+  A("[data-budget]",el=>{S.budget=el.dataset.budget;render()});
+  // app
+  document.querySelectorAll("[data-tab]").forEach(el=>el.onclick=()=>go(el.dataset.tab));
+  A("[data-day]",el=>{dayIdx=+el.dataset.day;render()});
+  A("[data-wk]",el=>{wk=+el.dataset.wk;render()});
+  A("[data-wkday]",el=>{wkDay=el.dataset.wkday;render()});
+  A("[data-wkmom]",el=>{wkMom=el.dataset.wkmom;render()});
+  A("[data-wkwho]",el=>{wkWho=el.dataset.wkwho;render()});
+  A("[data-wkcat]",el=>{cat=el.dataset.wkcat;wk=0;go("weekend")});
+  view.querySelectorAll("[data-tab]").forEach(el=>el.onclick=()=>go(el.dataset.tab));
+  A("[data-open]",el=>{detailId=+el.dataset.open;render();scrollTo({top:0})});
+  A("[data-cat]",el=>{cat=el.dataset.cat;render()});
+  const qi=$("#q"); if(qi)qi.oninput=e=>{q=e.target.value;const pos=qi.selectionStart;render();const n2=$("#q");n2.focus();n2.setSelectionRange(pos,pos)};
+  const af=$("#askform"); if(af){af.onsubmit=ev=>{ev.preventDefault();const v=$("#ask").value.trim();if(!v)return;askQ=v;page="recherche";detailId=null;render();scrollTo({top:0})};
+    let k=0;const inp=$("#ask");clearInterval(window._ph);window._ph=setInterval(()=>{if(!document.body.contains(inp)){clearInterval(window._ph);return}k=(k+1)%ASK_EX.length;inp.placeholder=ASK_EX[k]},3200)}
+  A("[data-ask]",el=>{askQ=el.dataset.ask;page="recherche";detailId=null;render();scrollTo({top:0})});
+  const goAvis=()=>{if(page!=="avis")avFrom=page;avState=avState==="ok"?"":avState;go("avis")};
+  const hv=$("#havis"); if(hv)hv.onclick=goAvis;
+  A("[data-goavis]",goAvis);
+  A("[data-star]",el=>{avForm.note=+el.dataset.star;render()});
+  A("[data-usage]",el=>{avForm.usage=el.dataset.usage;render()});
+  const ta=$("#av-aime"),tm=$("#av-manque"),tp=$("#av-prenom");
+  if(ta)ta.oninput=e=>{avForm.aime=e.target.value}; if(tm)tm.oninput=e=>{avForm.manque=e.target.value}; if(tp)tp.oninput=e=>{avForm.prenom=e.target.value};
+  const avf=$("#avform"); if(avf)avf.onsubmit=ev=>{ev.preventDefault();sendAvis()};
+  const avc=$("#avcopy"); if(avc)avc.onclick=()=>{const t=$("#av-copy");const done=()=>{avc.textContent="Copié"};try{navigator.clipboard.writeText(t.value).then(done,()=>{t.select()})}catch(e){t.select()}};
+  const avr=$("#avreload"); if(avr)avr.onclick=()=>{avList=null;render()};
+  const hs=$("#hsearch"); if(hs)hs.onclick=()=>{page="recherche";detailId=null;render();const i=$("#ask");if(i)i.focus()};
+  const tog2=(arr,v)=>arr.some(x=>nA(x)===nA(v))?arr.filter(x=>nA(x)!==nA(v)):[...arr,v];
+  A("[data-art]",el=>{S.artists=tog2(S.artists,el.dataset.art);save();
+    if(el.closest(".artbox")&&follows(el.dataset.art)===(el.getAttribute("aria-pressed")!=="true")&&!el.textContent.includes("✕")){el.setAttribute("aria-pressed",String(follows(el.dataset.art)));artDirty=true;const sm=$("#artsum"),an=$("#artn");if(sm)sm.textContent=artSummary();if(an)an.textContent=S.artists.length}
+    else{artOpen=!!el.closest(".artbox");render()}});
+  const ab=$("#artbox"); if(ab)ab.ontoggle=()=>{artOpen=ab.open;const l=ab.querySelector("summary .link");if(l)l.textContent=ab.open?"Fermer":"Modifier";if(!ab.open&&artDirty){artDirty=false;render()}};
+  const ok=$("#artok"); if(ok)ok.onclick=()=>{artOpen=false;artDirty=false;render();scrollTo({top:0,behavior:"smooth"})};
+  A("[data-follow]",el=>{S.artists=tog2(S.artists,el.dataset.follow);save();render()});
+  A("[data-alert]",el=>{const k=el.dataset.alert;S.alerts=S.alerts.includes(k)?S.alerts.filter(x=>x!==k):[...S.alerts,k];save();render()});
+  A("[data-tk]",el=>{tkFilter=el.dataset.tk;render()});
+  const ai=$("#artin"),aa=$("#artadd"); if(ai){const add=()=>{const v=ai.value.trim();if(v&&!follows(v)){S.artists=[...S.artists,v];artOpen=true;save();render();const n=$("#artin");if(n)n.focus()}};aa.onclick=add;ai.onkeydown=ev=>{if(ev.key==="Enter"){ev.preventDefault();add()}}}
+  A("[data-sw]",el=>swAct(el.dataset.sw)); bindSwipe();
+  const swr=$("#swreset"); if(swr)swr.onclick=()=>{seen=new Set();swToast="";render()};
+  const db=$("#dback"); if(db)db.onclick=()=>{detailId=null;render()};
+  const fv=$("#fav"); if(fv)fv.onclick=()=>{favs=tog(favs,detailId);save();render()};
+  A("[data-soon]",el=>{$("#soon").textContent=el.dataset.soon==="billet"?"Réservation : connexion aux billetteries partenaires prévue en phase 2.":"Restaurants autour de la salle : connexion à un partenaire de réservation prévue en phase 2."});
+  A("[data-edit]",el=>{snapshot=JSON.stringify(S);editing=true;onboard=+el.dataset.edit;render();scrollTo({top:0})});
+  const r=$("#restart"); if(r)r.onclick=()=>{Object.assign(S,JSON.parse(JSON.stringify(DEFAULT)));onboard=0;editing=false;dayIdx=0;save();render()};
+}
+let snapshot="{}";
+
+function confetti(){
+  if(matchMedia("(prefers-reduced-motion: reduce)").matches)return;
+  const c=$("#confetti"),x=c.getContext("2d");c.width=innerWidth;c.height=innerHeight;
+  const cols=["#FF4F1F","#FFD43B","#0A9E95","#D63F7A"];
+  const P=Array.from({length:110},()=>({x:innerWidth/2,y:innerHeight*.35,vx:(Math.random()-.5)*14,vy:Math.random()*-12-3,r:Math.random()*6+4,a:Math.random()*6,c:cols[Math.random()*4|0]}));
+  let f=0;(function tick(){x.clearRect(0,0,c.width,c.height);P.forEach(p=>{p.vy+=.35;p.x+=p.vx;p.y+=p.vy;p.a+=.2;x.save();x.translate(p.x,p.y);x.rotate(p.a);x.fillStyle=p.c;x.fillRect(-p.r/2,-p.r/4,p.r,p.r/2);x.restore()});
+  if(++f<110)requestAnimationFrame(tick);else x.clearRect(0,0,c.width,c.height)})();
+}
+const h=(location.hash||"").slice(1); if(TABS.some(t=>t[0]===h))page=h;
+render();
+</script>
+
+</body></html>

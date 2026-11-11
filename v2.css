@@ -1,0 +1,7 @@
+.v2notice{background:var(--ticket);color:#16132C;padding:12px 16px;border-radius:14px;font-size:.82rem}.v2nav{display:flex;gap:8px;flex-wrap:wrap}.v2nav button{flex:1}.planner{display:grid;gap:16px}.planner label{display:block;font-weight:600}.planner input,.planner select{display:block;width:100%;margin-top:6px;border:1.5px solid var(--line);background:var(--chip);color:var(--ink);padding:12px;border-radius:12px;font:inherit}.v2pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}.timeline{border-left:3px dashed var(--accent);padding-left:16px;display:grid;gap:14px}.timeline p{margin:0}.status{font-family:var(--mono);font-size:.78rem;color:var(--teal)}.error{color:var(--rose);font-weight:600}.v2saved{display:grid;gap:10px}.v2saved .ticket{display:grid;gap:10px}.v2saved h2{font-size:1.4rem}button{min-height:44px}a:focus-visible,select:focus-visible{outline:3px solid var(--ticket)}@media(min-width:900px){.app{max-width:720px}.cards{display:grid;grid-template-columns:1fr 1fr}.planner{padding:28px}.v2saved{grid-template-columns:1fr 1fr}}@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
+
+#user-age{width:100%;margin-top:10px;font:inherit;color:var(--ink);background:var(--chip);border:1.5px solid var(--line);border-radius:12px;padding:12px;min-height:44px}
+
+/* V3 : le nouveau nom reste lisible sur petit écran. */
+.brand{font-size:clamp(1.05rem,5vw,1.5rem);white-space:nowrap}
+@media(max-width:380px){header{gap:6px}.hright{gap:4px}}
