@@ -25,9 +25,11 @@ jobs:
           OPENAGENDA_KEY: ${{ secrets.OPENAGENDA_KEY }}
           OPENAGENDA_UIDS: ${{ vars.OPENAGENDA_UIDS }}
         # Une source en échec garde son ancien cache : on publie quand même les autres.
-        run: python3 ingestion/sync.py || echo "::warning::Une source a échoué, son ancien cache est conservé."
+        run: |
+          python3 ingestion/sync.py || echo "::warning::Une source a echoue, son ancien cache est conserve."
       - name: Contrôle du catalogue
-        run: python3 -c "import json;d=json.load(open('data/catalog.json'));n=len(d['events']);print(n,'événements');assert n>200,'Catalogue anormalement petit : publication annulée'"
+        run: |
+          python3 -c "import json;d=json.load(open('data/catalog.json'));n=len(d['events']);print(n,'evenements');assert n>200,'Catalogue anormalement petit, publication annulee'"
       - name: Préparer le site
         run: bash scripts/build-site.sh
       - name: Publier sur Cloudflare Pages
