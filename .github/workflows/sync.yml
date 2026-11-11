@@ -31,7 +31,7 @@ jobs:
       - name: Synchroniser les sources
         env:
           TICKETMASTER_KEY: ${{ secrets.TICKETMASTER_KEY }}
-          OPENAGENDA_KEY: ${{ secrets.OPENAGENDA_KEY }}
+          OPENAGENDA_KEY: ${{ secrets.OPENAGENDA }}
           OPENAGENDA_UIDS: ${{ vars.OPENAGENDA_UIDS }}
         # Une source en échec garde son ancien cache : on publie quand même les autres.
         run: |
@@ -44,6 +44,6 @@ jobs:
       - name: Publier sur Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
         with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          apiToken: ${{ secrets.CLOUDFARE }}
+          accountId: ${{ secrets.CLOUD_FARE_ACCOUNT_ID }}
           command: pages deploy dist --project-name=sorties-test-laure --branch=main
