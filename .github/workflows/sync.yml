@@ -1,0 +1,38 @@
+# Chaque nuit : récupère Ville de Paris, OpenAgenda et Ticketmaster, puis republie le site sur Cloudflare Pages.
+name: Mise à jour du catalogue
+on:
+  schedule:
+    - cron: '30 3 * * *'   # vers 4 h 30 à Paris
+  workflow_dispatch: {}    # bouton « Run workflow » pour lancer à la main
+permissions:
+  contents: read
+concurrency:
+  group: catalogue
+  cancel-in-progress: false
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Tests du connecteur
+        run: python3 -m unittest discover -s tests -p 'test_*.py'
+      - name: Synchroniser les sources
+        env:
+          TICKETMASTER_KEY: ${{ secrets.TICKETMASTER_KEY }}
+          OPENAGENDA_KEY: ${{ secrets.OPENAGENDA_KEY }}
+          OPENAGENDA_UIDS: ${{ vars.OPENAGENDA_UIDS }}
+        # Une source en échec garde son ancien cache : on publie quand même les autres.
+        run: python3 ingestion/sync.py || echo "::warning::Une source a échoué, son ancien cache est conservé."
+      - name: Contrôle du catalogue
+        run: python3 -c "import json;d=json.load(open('data/catalog.json'));n=len(d['events']);print(n,'événements');assert n>200,'Catalogue anormalement petit : publication annulée'"
+      - name: Préparer le site
+        run: bash scripts/build-site.sh
+      - name: Publier sur Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy dist --project-name=sorties-test-laure --branch=main
