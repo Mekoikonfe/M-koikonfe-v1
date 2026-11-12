@@ -44,7 +44,7 @@ if(!PLANNER_ENABLED){
     const names={paris:'Que faire à Paris (Ville de Paris, licence ODbL)',openagenda:'OpenAgenda (licences ouvertes)',ticketmaster:'Ticketmaster'};
     const src=((typeof liveData!=='undefined'&&liveData&&liveData.sources)||[]).filter(x=>x.status==='ok'&&names[x.name]).map(x=>names[x.name]).join(', ')||names.paris;
     const when=(typeof liveData!=='undefined'&&liveData&&liveData.generatedAt)?new Date(liveData.generatedAt).toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'}):'';
-    view.insertAdjacentHTML('beforeend','<p class="sample">Agenda : '+esc(src)+(when?', mis à jour le '+esc(when):'')+'. Horaires, tarifs et disponibilité à vérifier sur la fiche source.<br>Version du 11 novembre · V8</p>')};
+    view.insertAdjacentHTML('beforeend','<p class="sample">Agenda : '+esc(src)+(when?', mis à jour le '+esc(when):'')+'. Horaires, tarifs et disponibilité à vérifier sur la fiche source.<br>Version du 12 novembre · V9</p>')};
 
   if(page==='organiser')page='accueil';
   // Verrou : aucun chemin (ancien lien #organiser, bouton « Reprendre ») ne rouvre l'organisateur.

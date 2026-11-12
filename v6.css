@@ -1,0 +1,22 @@
+/* V6 — accueil simplifié */
+.v6search{display:flex;align-items:center;gap:10px;background:var(--surface);border:1.5px solid var(--line);border-radius:999px;padding:0 6px 0 16px;min-height:52px;position:relative}
+.v6search svg{width:20px;height:20px;flex:0 0 auto;stroke:var(--muted);fill:none;stroke-width:2;stroke-linecap:round}
+.v6search input{flex:1;min-width:0;border:0;outline:0;background:transparent;font:inherit;font-size:15px;color:var(--ink);padding:0}
+.v6search .btn{padding:10px 16px;min-height:40px}
+.v6sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.v6occ{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.v6occ button{font:inherit;font-size:13px;font-weight:600;min-height:64px;border-radius:14px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer}
+.v6occ button b{font-family:var(--display);font-weight:800;font-size:17px}
+.v6occ button[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.v6occ button[aria-pressed=true] b{color:var(--ticket)}
+.v6h2{font-family:var(--display);font-weight:800;font-size:20px;margin:0}
+.v6whenrow{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.35fr) minmax(0,1fr) 52px;gap:6px}
+.v6when{font:inherit;font-size:14px;min-height:44px;border-radius:999px;border:1.5px solid var(--line);background:transparent;color:var(--ink);cursor:pointer;padding:0 6px;white-space:nowrap}
+.v6when[aria-pressed=true]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
+.v6cal{display:flex;align-items:center;justify-content:center;background:var(--surface)}
+.v6cal svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.v6datebox{display:flex;flex-direction:column;gap:6px;font-weight:600;font-size:14px}
+.v6datebox input{font:inherit;padding:10px 12px;border-radius:12px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink)}
+.v6sum{margin:0;font-size:13px;color:var(--muted)}
+.v6genres{margin-bottom:-6px}
+.v6links .btn{width:100%}
