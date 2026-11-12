@@ -960,7 +960,7 @@ function parseAsk(raw){
   else if(/week.?end|\bwe\b/.test(t))p.days=W[0];
   else if(/semaine prochaine/.test(t))p.days=idx(i=>i>=7-((DAYS[0].getDay()+6)%7)&&i<14-((DAYS[0].getDay()+6)%7));
   else if(/cette semaine/.test(t))p.days=idx(i=>i<7-((DAYS[0].getDay()+6)%7));
-  else if(/vacances|toussaint/.test(t))p.days=idx(i=>iso(DAYS[i])<="2026-11-01");
+  else if(/vacances|toussaint|noel/.test(t)){const v=idx(i=>iso(DAYS[i])>="2026-12-19"&&iso(DAYS[i])<="2027-01-03");p.days=v.length?v:idx(i=>WE.includes(DAYS[i].getDay()))}
   else if(/novembre/.test(t))p.days=idx(i=>DAYS[i].getMonth()===10);
   else {const w=WDN.findIndex(n=>new RegExp("\\b"+n+"\\b").test(t));if(w>=0){const i=DAYS.findIndex(d=>d.getDay()===w);p.days=[i]}}
   if(p.days)p.dayLabel=/week.?end|\bwe\b/.test(t)?(W.indexOf(p.days)===1?"le week-end prochain":"ce week-end")+" ("+lbl(p.days)+")":lbl(p.days);
@@ -1197,6 +1197,7 @@ const h=(location.hash||"").slice(1); if(TABS.some(t=>t[0]===h))page=h;
 <script src="live-ui.js?v=6"></script>
 <script src="v4-shotgun.js?v=6"></script>
 <script src="v5-simple.js?v=6"></script>
-<script src="v6-accueil.js?v=6"></script>
+<script src="v6-accueil.js?v=7"></script>
+<script src="v7-retours.js?v=7"></script>
 
 </body></html>
