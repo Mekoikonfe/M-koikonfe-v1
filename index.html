@@ -1,5 +1,6 @@
 <!doctype html><html lang="fr"><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
-<title>Mékoikonfé · On sort ? On s’occupe de la suite.</title>
+<title>Venivi · La culture, ça se vit</title>
+<meta name="description" content="Venivi : concerts, théâtre, expos, spectacles enfants. Des idées de sorties selon vos goûts, à deux, en famille ou entre amis.">
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&family=Instrument+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap">
@@ -26,6 +27,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16p
 header{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .brand{font-family:var(--display);font-weight:800;font-size:1.5rem;letter-spacing:-.02em}
 .brand span{color:var(--accent)}
+.brand .tagline{display:block;font-family:var(--body);font-weight:500;font-size:.72rem;letter-spacing:0;color:var(--muted);margin-top:1px}
 .stub{font-family:var(--mono);font-size:.75rem;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
 
 .perfs{display:flex;gap:6px}
@@ -314,7 +316,7 @@ canvas#confetti{position:fixed;inset:0;pointer-events:none;width:100%;height:100
 <canvas id="confetti" aria-hidden="true"></canvas>
 <form name="avis" data-netlify="true" netlify-honeypot="bot-field" hidden><input name="bot-field"><input name="note"><textarea name="aime"></textarea><textarea name="manque"></textarea><input name="usage"><input name="prenom"><input name="page"></form>
 <div class="app">
-  <header><div class="brand">Mékoikon<span>fé</span></div><div class="hright"><div class="stub" id="stubno"></div><button class="avbtn" id="havis" hidden>Avis</button><button class="iconbtn" id="hsearch" hidden aria-label="Rechercher"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button></div></header>
+  <header><div class="brand">Veni<span>vi</span><small class="tagline">La culture, ça se vit</small></div><div class="hright"><div class="stub" id="stubno"></div><button class="avbtn" id="havis" hidden>Avis</button><button class="iconbtn" id="hsearch" hidden aria-label="Rechercher"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button></div></header>
   <div class="perfs" id="perfs" aria-hidden="true"></div>
   <main id="view"></main>
 </div>
@@ -656,7 +658,7 @@ function nav(ok,label="Suivant"){
 }
 function onboardingView(){
   const i=onboard;
-  if(i===0)return `<section class="ticket notch step"><div class="eyebrow">Accueil · on fait connaissance</div>
+  if(i===0)return `<section class="ticket notch step"><div class="eyebrow">Venivi · la culture, ça se vit</div>
     <h1>Votre prochaine sortie commence ici.</h1>
     <p class="lead">Six petits billets à remplir, et on vous sort un programme pour chaque jour : spectacles, concerts, salons, à deux ou avec les enfants.</p>
     <div class="tear"></div><div class="stack">
@@ -764,7 +766,7 @@ let avForm={note:0,aime:"",manque:"",usage:"",prenom:""}, avState="", avFrom="ac
 const USAGES=[["semaine","Oui, chaque semaine"],["mois","De temps en temps"],["non","Probablement pas"]];
 function pageAvis(){
   if(avState==="ok")return `<div class="stack step"><div class="ticket notch"><div class="eyebrow">Merci</div><h1>Avis bien reçu.</h1>
-    <p class="lead">Il servira à améliorer Mékoikonfé. Vous pouvez en envoyer un autre plus tard, après avoir testé d'autres pages.</p>
+    <p class="lead">Il servira à améliorer Venivi. Vous pouvez en envoyer un autre plus tard, après avoir testé d'autres pages.</p>
     <div class="actions"><span></span><button class="btn primary" data-tab="${avFrom}">Retour à l'appli</button></div></div></div>`;
   const canSend=(DB&&ME)||STANDALONE;
   const text=`Note : ${avForm.note}/5\nJ'ai aimé : ${avForm.aime}\nÀ améliorer : ${avForm.manque}\nUsage : ${(USAGES.find(u=>u[0]===avForm.usage)||["",""])[1]}`;
@@ -787,7 +789,7 @@ async function sendAvis(){
   const entry={note:avForm.note,aime:avForm.aime.slice(0,2000),manque:avForm.manque.slice(0,2000),usage:avForm.usage,prenom:avForm.prenom.slice(0,60),page:avFrom,at:new Date().toISOString()};
   if(STANDALONE){
     avState="sending";avErr="";render();
-    try{const r=await fetch(FORMSPREE_URL,{method:"POST",headers:{"Accept":"application/json","Content-Type":"application/json"},body:JSON.stringify({_subject:"Avis Mékoikonfé : "+entry.note+"/5",note:String(entry.note),aime:entry.aime,manque:entry.manque,usage:(USAGES.find(u=>u[0]===entry.usage)||["",""])[1],prenom:entry.prenom,page:entry.page})});
+    try{const r=await fetch(FORMSPREE_URL,{method:"POST",headers:{"Accept":"application/json","Content-Type":"application/json"},body:JSON.stringify({_subject:"Avis Venivi : "+entry.note+"/5",note:String(entry.note),aime:entry.aime,manque:entry.manque,usage:(USAGES.find(u=>u[0]===entry.usage)||["",""])[1],prenom:entry.prenom,page:entry.page})});
       if(!r.ok)throw new Error(r.status);avState="ok";avForm={note:0,aime:"",manque:"",usage:"",prenom:avForm.prenom}}
     catch(e){avState="";avErr="L'envoi n'a pas abouti. Vérifiez votre connexion et réessayez."}
     render();return;

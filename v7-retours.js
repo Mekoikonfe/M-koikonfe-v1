@@ -2,7 +2,7 @@
    duels retirés du quiz (remplacés par une « Envie du moment » facultative dans le Profil),
    recherche d'artiste stricte : la prochaine date, ou « rien de programmé », jamais de suggestion hors sujet. */
 'use strict';
-const V7VERSION='Version du 12 novembre · V10';
+const V7VERSION='Version du 24 novembre · V12 · Venivi';
 
 /* ---------- Icônes à la place des « Ha! », « Tada », « 5,6,7,8 »… ---------- */
 const ICONS={

@@ -23,7 +23,7 @@ assert.equal(run("budgetScore(26,'eco')"),-12);
 assert.equal(run("budgetScore(60,'mid')"),8);
 assert.equal(run("budgetScore(null,'eco')"),0);
 run("S.budget='any';save()");assert.equal(JSON.parse(store.get('entracte2')).S.budget,'any');
-assert.match(html,/Mékoikon<span>fé/);
+assert.match(html,/Veni<span>vi/);
 assert.match(html,/Peu importe, j’vois large 😅/);
 run("S.budget='any'");
 assert.equal(run("score({...EVENTS[0],price:5},null,null).pct"),run("score({...EVENTS[0],price:1000},null,null).pct"));
