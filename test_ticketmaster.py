@@ -32,7 +32,7 @@ class TicketmasterTest(unittest.TestCase):
             calls.append(u); return {'_embedded':{'events':[tm(str(len(calls)),'Show','2026-11-20','19:00:00')]},'page':{'totalPages':1}}
         with mock.patch.dict(os.environ,{'TICKETMASTER_KEY':'k'}),mock.patch.object(sync,'get',fake),mock.patch.object(sync.time,'sleep',lambda s:None):
             rows=sync.ticketmaster_records(self.now)
-        self.assertEqual(len(calls),6); self.assertEqual(len(rows),1); self.assertEqual(len(rows[0]['dates']),6)
+        self.assertEqual(len(calls),16); self.assertEqual(len(rows),1); self.assertEqual(len(rows[0]['dates']),16)
     def test_openagenda_multiple_uids(self):
         with mock.patch.dict(os.environ,{'OPENAGENDA_UIDS':'123, 456;789','OPENAGENDA_KEY':'k'},clear=True): self.assertEqual(sync.openagenda_uids(),[123,456,789])
         with mock.patch.dict(os.environ,{'OPENAGENDA_UID':'42'},clear=True): self.assertEqual(sync.openagenda_uids(),[42])

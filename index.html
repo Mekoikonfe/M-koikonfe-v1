@@ -2,6 +2,37 @@
 <title>Venivi · La culture, ça se vit</title>
 <meta name="description" content="Venivi : concerts, théâtre, expos, spectacles enfants. Des idées de sorties selon vos goûts, à deux, en famille ou entre amis.">
 <meta name="claude:viewport-fit-sides" content="cover">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Venivi">
+<meta property="og:title" content="Venivi · La culture, ça se vit">
+<meta property="og:description" content="Concerts, théâtre, expos, spectacles enfants : des idées de sorties selon vos goûts, à deux, en famille ou entre amis, près de chez vous.">
+<meta property="og:url" content="https://venivi.fr/">
+<meta property="og:image" content="https://venivi.fr/og.png">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta property="og:locale" content="fr_FR">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#FF4F1F">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<script id="migration">
+/* Ancienne adresse : on emmène le profil vers venivi.fr, puis on redirige. */
+(function(){
+  var KEYS=['entracte2','mekoikonfe-v4','mekoikonfe-v6'];
+  try{
+    if(/\.pages\.dev$/.test(location.hostname)&&location.hostname.indexOf('sorties-test-laure')===0){
+      var d={};KEYS.forEach(function(k){var v=localStorage.getItem(k);if(v)d[k]=v});
+      var h=Object.keys(d).length?'#migrer='+encodeURIComponent(JSON.stringify(d)):location.hash;
+      location.replace('https://venivi.fr/'+location.search+h);return;
+    }
+    if(location.hash.indexOf('#migrer=')===0){
+      var x=JSON.parse(decodeURIComponent(location.hash.slice(8)));
+      if(x&&typeof x==='object'&&!localStorage.getItem('entracte2'))KEYS.forEach(function(k){if(typeof x[k]==='string'&&x[k].length<60000){JSON.parse(x[k]);localStorage.setItem(k,x[k])}});
+      history.replaceState(null,'',location.pathname+location.search);
+    }
+  }catch(e){try{history.replaceState(null,'',location.pathname+location.search)}catch(_){}}
+})();
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&family=Instrument+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap">
 <style>
@@ -1201,5 +1232,6 @@ const h=(location.hash||"").slice(1); if(TABS.some(t=>t[0]===h))page=h;
 <script src="v5-simple.js?v=6"></script>
 <script src="v6-accueil.js?v=7"></script>
 <script src="v7-retours.js?v=7"></script>
+<script src="v8-billets.js?v=8"></script>
 
 </body></html>

@@ -1,5 +1,5 @@
 """Connecteurs autorisés, normalisation et publication atomique. Python 3.9+."""
-import argparse, datetime as dt, hashlib, json, os, pathlib, re, time, unicodedata, urllib.request, urllib.parse
+import argparse, csv, datetime as dt, gzip, hashlib, io, json, os, pathlib, re, time, unicodedata, urllib.request, urllib.parse
 from zoneinfo import ZoneInfo
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 PARIS = 'https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/que-faire-a-paris-/records'
@@ -50,17 +50,20 @@ def openagenda_records():
     return rows
 
 TM='https://app.ticketmaster.com/discovery/v2/events.json'
+HORIZON={'ticketmaster':182}  # jours ; les autres sources restent à 42
 TM_LICENCE={'name':'Ticketmaster Discovery API — conditions d’utilisation','url':'https://developer.ticketmaster.com/support/terms-of-use/','publisher':'Ticketmaster'}
 
 def ticketmaster_records(now=None):
-    # Clé côté serveur uniquement (TICKETMASTER_KEY). Paris et 40 km autour, 42 jours, par fenêtres de 7 jours
+    # Clé côté serveur uniquement (TICKETMASTER_KEY). Paris et 40 km autour, jusqu'à 182 jours
     # pour rester sous la limite de pagination profonde de l'API (1 000 résultats par requête).
     key=os.environ.get('TICKETMASTER_KEY')
     if not key: return []
     now=now or dt.datetime.now(UTC); rows=[]
-    for w in range(6):
-        a=now+dt.timedelta(days=7*w); b=a+dt.timedelta(days=7)
-        for page in range(5):
+    # 6 premières semaines par fenêtres de 7 jours, puis jusqu'à 6 mois par fenêtres de 14 jours (recherche d'artiste).
+    windows=[(7*w,7) for w in range(6)]+[(42+14*w,14) for w in range(10)]
+    for start,length in windows:
+        a=now+dt.timedelta(days=start); b=a+dt.timedelta(days=length)
+        for page in range(5 if start<42 else 3):
             q={'apikey':key,'latlong':'48.8566,2.3522','radius':40,'unit':'km','countryCode':'FR','locale':'fr-fr','size':200,'page':page,'sort':'date,asc',
                'startDateTime':a.strftime('%Y-%m-%dT%H:%M:%SZ'),'endDateTime':b.strftime('%Y-%m-%dT%H:%M:%SZ')}
             data=get(TM+'?'+urllib.parse.urlencode(q))
@@ -158,13 +161,13 @@ def normalize(r, source, now):
         try:
             start,end=map(stamp,pair)
             if end<start: raise ValueError()
-            if end<now or start>now+dt.timedelta(days=42): continue
+            if end<now or start>now+dt.timedelta(days=HORIZON.get(source,42)): continue
             # Une période de plusieurs jours n'est jamais une séance inventée.
             if end-start>dt.timedelta(hours=18): warnings.append('Période continue : horaires à consulter sur la source');continue
             sessions.append({'start':start.isoformat(),'end':end.isoformat(),'localDate':start.astimezone(ZoneInfo('Europe/Paris')).date().isoformat(),'localTime':start.astimezone(ZoneInfo('Europe/Paris')).strftime('%H:%M')})
         except (ValueError,TypeError): warnings.append('Occurrence invalide écartée')
     sessions=sorted({s['start']:s for s in sessions}.values(),key=lambda x:x['start'])
-    if not sessions: warnings.append('Aucune séance exploitable dans les 42 prochains jours')
+    if not sessions: warnings.append('Aucune séance exploitable dans les %d prochains jours'%HORIZON.get(source,42))
     if not venue or not city: warnings.append('Lieu incomplet')
     if not updated: warnings.append('Date de mise à jour source absente')
     return {'key':source+':'+str(rid),'title':clean(title),'category':cat,'description':clean(description),'venue':clean(venue) or 'Lieu à vérifier','city':clean(city),'address':clean(address),'geo':geo,'sessions':sessions,'period':{'start':r.get('date_start'),'end':r.get('date_end')},'priceText':clean(price),'priceVerified':False,'availability':'unknown','source':{'name':source,'id':str(rid),'url':url(link),'updatedAt':updated,'licence':licence},'lastCheckedAt':now.isoformat(),'quality':{'warnings':sorted(set(warnings)),'status':'incomplete' if warnings else 'usable'}}
@@ -179,6 +182,79 @@ def deduplicate(events):
         else:
             e['sources']=[e['source']];out[fingerprint]=e
     return list(out.values())
+
+# ---------- Offres affiliées (flux catalogue Awin) ----------
+# Le flux n'ajoute aucun événement : il rattache un lien d'achat rémunéré et un prix aux événements déjà au catalogue,
+# uniquement quand le titre correspond sans ambiguïté. L'adresse du flux (qui contient la clé) vient des secrets GitHub.
+AFFILIATES={'billetreduc':{'env':'AWIN_BILLETREDUC_FEED','label':'BilletRéduc','host':'billetreduc.com'}}
+TITLE_STOP={'le','la','les','l','un','une','des','de','du','d','et','a','au','aux','en','avec','the','spectacle','concert','piece','theatre','show','live','paris','tournee','tour'}
+
+def title_key(t):
+    t=fold(clean(t)).split('|')[0]
+    t=re.sub(r'\(.*?\)|\[.*?\]','',t)
+    words=[w for w in re.split(r'[^a-z0-9]+',t) if w and w not in TITLE_STOP]
+    return ' '.join(words)
+
+VENUE_STOP={'theatre','eglise','salle','de','la','le','les','du','des','l','d','paris','grande','petite','grand','petit','the','espace','saint','sainte','st','et','a','au','centre','maison','cafe','scene','arrondissement'}
+def venue_tokens(v): return {w for w in re.split(r'[^a-z0-9]+',fold(clean(v))) if len(w)>2 and w not in VENUE_STOP and not w.isdigit()}
+def venue_ok(a,b):
+    ta,tb=venue_tokens(a),venue_tokens(b)
+    return bool(ta and tb and ta&tb)
+
+def fetch_text(address):
+    with urllib.request.urlopen(urllib.request.Request(address,headers={'User-Agent':'Venivi/1.0'}),timeout=120) as r: raw=r.read()
+    if raw[:2]==b'\x1f\x8b': raw=gzip.decompress(raw)
+    return raw.decode('utf-8-sig',errors='replace')
+
+def col(row,*names):
+    for n in names:
+        v=row.get(n)
+        if v not in (None,''): return v.strip()
+    return ''
+
+def parse_offers(text,host):
+    offers={}
+    for row in csv.DictReader(io.StringIO(text)):
+        link=col(row,'aw_deep_link','deep_link','tracking_url')
+        name=col(row,'product_name','title','name')
+        if not link.startswith('https://') or not name: continue
+        target=col(row,'merchant_deep_link','link')
+        if target and host not in target: continue
+        def num(v):
+            try: return float(v.replace(',','.').replace('EUR','').strip())
+            except ValueError: return float('nan')
+        full=num(col(row,'search_price','display_price','price') or 'nan'); low=num(col(row,'Tickets:min_price') or 'nan')
+        # Prix réduit BilletRéduc (« à partir de »), sauf valeurs aberrantes (forfaits à 2 € sur une place à 30 €).
+        price=low if low==low and (full!=full or low>=0.25*full) else full
+        k=title_key(name)
+        if len(k)<4: continue
+        o={'url':link,'title':clean(name)[:160],'venue':clean(col(row,'Tickets:venue_name','venue','merchant_category'))[:120]}
+        if price==price and 0<price<5000: o['price']=round(price,2)
+        offers.setdefault(k,[]).append(o)
+    return offers
+
+def attach_offers(events,now):
+    states=[]
+    for key,cfg in AFFILIATES.items():
+        address=os.environ.get(cfg['env'])
+        if not address: states.append({'name':key,'status':'not_configured'}); continue
+        try:
+            offers=parse_offers(fetch_text(address),cfg['host']); matched=0
+            for e in events:
+                cand=offers.get(title_key(e['title']))
+                if not cand: continue
+                v=e.get('venue') or ''
+                if v and v!='Lieu à vérifier':
+                    # Même titre ne veut pas dire même spectacle : la salle doit concorder quand elle est connue des deux côtés.
+                    cand=[o for o in cand if o['venue'] and venue_ok(v,o['venue'])]
+                    if not cand: continue
+                elif len(cand)!=1: continue
+                cand=sorted(cand,key=lambda o:o.get('price') if o.get('price') is not None else 1e9)
+                o=cand[0]; e.setdefault('offers',{})[key]={'url':o['url'],'price':o.get('price'),'label':cfg['label']}; matched+=1
+            states.append({'name':key,'status':'ok','checkedAt':now.isoformat(),'offers':sum(map(len,offers.values())),'matched':matched})
+        except Exception as ex:
+            states.append({'name':key,'status':'error','message':type(ex).__name__,'attemptedAt':now.isoformat()})
+    return states
 
 def publish(path,data):
     tmp=path.with_suffix(path.suffix+'.tmp');tmp.write_text(data,encoding='utf8');tmp.replace(path)
@@ -202,11 +278,12 @@ def sync():
         except Exception as ex:
             events.extend(e for e in old['events'] if e['source']['name']==name)
             states.append({'name':name,'status':'error','message':type(ex).__name__,'attemptedAt':now.isoformat()})
-    result={'schemaVersion':1,'generatedAt':now.isoformat(),'sources':states,'events':deduplicate(events)}
+    merged=deduplicate(events); offer_states=attach_offers(merged,now)
+    result={'schemaVersion':1,'generatedAt':now.isoformat(),'sources':states,'affiliates':offer_states,'events':merged}
     text=json.dumps(result,ensure_ascii=False,indent=2)
     publish(path,text)
     publish(ROOT/'data/catalog.js','window.MEKO_CATALOG='+text.replace('<','\\u003c')+';\n')
-    print(json.dumps({'sources':states,'events':len(result['events'])},ensure_ascii=False))
+    print(json.dumps({'sources':states,'affiliates':offer_states,'events':len(result['events'])},ensure_ascii=False))
     return all(s['status']!='error' for s in states)
 
 if __name__=='__main__':
