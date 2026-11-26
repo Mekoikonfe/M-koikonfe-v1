@@ -31,6 +31,7 @@ jobs:
       - name: Synchroniser les sources
         env:
           TICKETMASTER_KEY: ${{ secrets.TICKETMASTER_KEY }}
+          AWIN_BILLETREDUC_FEED: ${{ secrets.AWIN_BILLETREDUC_FEED }}
           OPENAGENDA_KEY: ${{ secrets.OPENAGENDA }}
           OPENAGENDA_UIDS: ${{ vars.OPENAGENDA_UIDS }}
         # Une source en échec garde son ancien cache : on publie quand même les autres.
